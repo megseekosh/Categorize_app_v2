@@ -11,7 +11,7 @@ GUI to chop, categorize, and annotate audio clips from daylong recordings.
 
 # Compute_biling_dominance
 
-Several notebooks to reliably estimate the bilingual dominance of speakers from daylong audio recordings.
+Several notebooks to reliably estimate the bilingual dominance of speakers from daylong audio recordings. 
 
 3_bilingual_ratio.ipynb - estimates the ratio between language categories for a given speaker using responses.csv from 2_categorize_app
 
