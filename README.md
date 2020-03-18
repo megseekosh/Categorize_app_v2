@@ -44,11 +44,11 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 	
 	`python3 split_app.py`
 	
-	You will be prompted to select an audio file on your local machine to process:
+	You will be prompted with a window to select an audio file on your local machine to process:
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/audio_cut_prompt.png "audio file prompt")
 	
-	You will be prompted to select a directory to store the chopped files and generated `config.csv` file:
+	You will be prompted with a window to select a directory to store the chopped files and generated `config.csv` file:
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/output_directory_prompt.png "output_directory_prompt")
 	
@@ -60,11 +60,11 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 	
 	`python3 categorize_app.py`
 	
-	You will be prompted to select a metadata file (`config.csv`):
+	You will be prompted with a window to select a metadata file (`config.csv`):
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/metadata_prompt.png "metadata_prompt")
 
-	You will be prompted to enter your name (to calculate inter-rater reliability in the event that you have multiple annotators):
+	You will be prompted with a window to enter your name (to calculate inter-rater reliability in the event that you have multiple annotators):
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/name_prompt.png "name_prompt")
 	
