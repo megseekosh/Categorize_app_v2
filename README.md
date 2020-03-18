@@ -1,8 +1,14 @@
 # Categorize_app 
 
-GUI to chop, categorize, and annotate audio clips from daylong recordings. This version annotates ambient language characteristics like choice of language (for bilingual environments), child-directed speech, and speaker category. However, the application is easily modifiable for any annotation needs. 
+GUI to chop, categorize, and annotate audio clips from daylong recordings. This version annotates ambient language characteristics like language spoken (for bilingual environments), child-directed speech, and speaker category. However, the application is easily modifiable for any annotation needs. 
 
 ## What's what in this repo
+
+Go to
+⋅⋅* a description of the materials in the repo[description-of-materials-in-the-repo]
+⋅⋅* an example work flow to process and annotate recordings[example-work-flow]
+
+## Description of Materials In The Repo
 
 ### To prepare daylong audio recordings for annotation and annotate them
 
@@ -25,7 +31,7 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 
 5_relisten_app.py - to appear; draws all files that appear in the `filename_relisten.csv` dataframe to listen to again (without replacement)
 
-## Work flow
+## Example Work Flow
 
 1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise
 
@@ -35,7 +41,7 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 
 2. Run the chopper and vocal activity detector
 
-	Using the command line, move inside of 1_chunk-and-label/ and run the following:
+	Using the command line, move inside of `1_chunk-and-label/` and run the following:
 	
 	`python3 split_app.py`
 	
@@ -43,7 +49,7 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/audio_cut_prompt.png "audio file prompt")
 	
-	You will be prompted to select a directory to store the chopped files and `config.csv` file:
+	You will be prompted to select a directory to store the chopped files and generated `config.csv` file:
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/output_directory_prompt.png "output_directory_prompt")
 	
