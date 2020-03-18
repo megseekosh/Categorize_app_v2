@@ -5,7 +5,7 @@ GUI to chop, categorize, and annotate audio clips from daylong recordings. This 
 ## What's what in this repo
 
 Go to
-* a description of the materials in the repo[##description-of-materials-in-the-repo]
+* [a description of the materials in the repo](##description-of-materials-in-the-repo)
 * an example work flow to process and annotate recordings[example-work-flow]
 
 ##Description of Materials In The Repo
