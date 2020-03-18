@@ -1,6 +1,6 @@
 # Categorize_app 
 
-GUI to chop, categorize, and annotate audio clips from daylong recordings. This version annotates ambient language characteristics like language spoken (for bilingual environments), child-directed speech, and speaker category. However, the application is easily modifiable for any annotation needs. 
+GUI to chop, categorize, and annotate audio clips from daylong recordings. This version annotates ambient language characteristics like language spoken (for bilingual environments), child-directed speech, and speaker category. However, the application is easily modifiable for any annotation categories. 
 
 ## What's what in this repo
 
