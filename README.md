@@ -46,11 +46,11 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 	
 	You will be prompted to select an audio file on your local machine to process:
 	
-	![alt text](https://github.com/megseekosh/Categorize_app_v2/audio_cut_prompt.png "audio file prompt")
+	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/audio_cut_prompt.png "audio file prompt")
 	
 	You will be prompted to select a directory to store the chopped files and generated `config.csv` file:
 	
-	![alt text](https://github.com/megseekosh/Categorize_app_v2/output_directory_prompt.png "output_directory_prompt")
+	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/output_directory_prompt.png "output_directory_prompt")
 	
 	The speed of the VAD depends on your machine, but a good estimate is 1 second/clip or 24 minutes for a 12 hour recording. 
 	
@@ -62,11 +62,11 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 	
 	You will be prompted to select a metadata file (`config.csv`):
 	
-	![alt text](https://github.com/megseekosh/Categorize_app_v2/metadata_prompt.png "metadata_prompt")
+	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/metadata_prompt.png "metadata_prompt")
 
 	You will be prompted to enter your name (to calculate inter-rater reliability in the event that you have multiple annotators):
 	
-	![alt text](https://github.com/megseekosh/Categorize_app_v2/name_prompt.png "name_prompt")
+	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/name_prompt.png "name_prompt")
 	
 	The main interactive window will appear, which can be easily modified in the source code according to your annotation goals. In the current example, the following window is displayed:
 	
