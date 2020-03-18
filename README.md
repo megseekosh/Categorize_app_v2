@@ -32,7 +32,7 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 
 ## Example Work Flow
 
-1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise
+1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise. Interspersing white noise allows the annotator to know if a new recording has begun in the middle of a clip. 
 
 	On the command line, type the following:
 	
