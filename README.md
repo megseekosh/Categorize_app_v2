@@ -6,9 +6,9 @@ GUI to chop, categorize, and annotate audio clips from daylong recordings. This 
 
 Go to
 * [a description of the materials in the repo](##description-of-materials-in-the-repo)
-* an example work flow to process and annotate recordings[example-work-flow]
+* [an example work flow to process and annotate recordings](example-work-flow)
 
-##Description of Materials In The Repo
+## Description of Materials In The Repo
 
 ### To prepare daylong audio recordings for annotation and annotate them
 
@@ -31,7 +31,7 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 
 5_relisten_app.py - to appear; draws all files that appear in the `filename_relisten.csv` dataframe to listen to again (without replacement)
 
-##Example Work Flow
+## Example Work Flow
 
 1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise
 
