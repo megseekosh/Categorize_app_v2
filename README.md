@@ -54,7 +54,7 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 	`python3 split_app.py 6396 06122018 05152019 female`
 	
-	You will be prompted with a window to select an audio file on your local machine to process:
+	After starting the application, you will be prompted with a window to select an audio file on your local machine to process:
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/audio_cut_prompt.png "audio file prompt")
 	
@@ -80,9 +80,9 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 	The main interactive window will appear, which can be easily modified in the source code according to your annotation goals. In the current example, the following window is displayed:
 	
-	![alt text](https://github.com/megseekosh/Categorize_app_v2/annotation_window.png "annotation_window")
+	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/annotation_window.png "annotation_window")
 	
-	Press "Play." Various metadata details will display in the command line. After the clip, make your selection from the menus and hit "Next" or "Repeat". To play future clips in your current annotation session, only press "Next." 
+	Press "Play." Various metadata details will display in the command line. After the clip, make your selection from the menus and hit "Next" or "Repeat". You can repeat as many times as you would like. To play the next clip in your current annotation session, always press "Next." 
 	
 	When you have completed with that annotation session, you can close the application and restart at any time. 
 	
@@ -94,7 +94,7 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 	Select the notebook you would like to use from the webpage. 
 	
-	In the second cell of the notebook, write the path name to the `responses.csv` file for the participant. Run the notebook and evaluate your progress. 
+	In the second cell of the notebook, write the path name to the `responses.csv` file on your computer for the participant. Run the notebook and evaluate your progress. 
 
 ## Citations
 
