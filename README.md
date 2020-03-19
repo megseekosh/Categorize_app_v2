@@ -32,11 +32,11 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 
 ## Example Work Flow
 
-1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise. Interspersing white noise allows the annotator to know if a new recording has begun in the middle of a clip. 
+1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise such as `whiteNoise16.wav` which is included in this repo. Interspersing white noise allows the annotator to know if a new recording has begun in the middle of a clip. 
 
 	On the command line, type the following:
 	
-	``
+	`sox filename whiteNoise16.wav filename whiteNoise16.wav filename whiteNoise16.wav new_name_of_combined_files.wav` 
 
 2. Run the chopper and vocal activity detector
 
