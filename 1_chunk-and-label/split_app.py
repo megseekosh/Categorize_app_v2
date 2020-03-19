@@ -6,6 +6,8 @@ from tkinter.messagebox import showinfo
 # For the info output
 import csv
 
+import sys
+
 # These are used to split audio and tell its speech contents
 from split_audio import split_file
 from find_speech import vad_trial
@@ -68,8 +70,8 @@ def select_and_slice_file():
         filename_progress = ('%0'+str(ceil(log10(filecount)))+'d')%file
 
 ###when hard coding add id and age in here - for next 2 lines!!
-        filename = output_dir + '/1006' + '_060015_' + filename_progress + '.wav'
-        filename_for_csv = '1006' + '_060015_' + filename_progress + '.wav'
+        filename = output_dir + '/' + child_ID + '_' + birth_date + '_' + filename_progress + '.wav'
+        filename_for_csv = child_ID + '_' + birth_date + '_' + filename_progress + '.wav'
 
 
         print("\t" + filename)
@@ -105,8 +107,8 @@ def select_and_slice_file():
 
 ###when hard coding add all details in here: id, age, date, gender 
         #to get multiple columns we add everything to what was just the "percents" list
-        #in order of    file name,  		 id,     age,       date,    gender,  timestamp,   percents
-        percents.append([filename_for_csv, '1006', '060015', '20180528', 'female', timestamp, vad_trial(filename)])
+        #in order of    file name,  		 id,        age,       date,    gender,  timestamp,   percents
+        percents.append([filename_for_csv, child_ID, birth_date, record_date, gender, timestamp, vad_trial(filename)])
 
     # Write the csv data log file
     print("writing the csv")
@@ -128,6 +130,10 @@ def select_and_slice_file():
 
 # The running program
 if __name__ == '__main__':
+    child_ID = sys.argv[1]
+    birth_date = sys.argv[2]
+    record_date = sys.argv[3]
+    gender = sys.argv[4]
     # Make sure the general tk window does not appear
     tk.Tk().withdraw()
     # Run the program

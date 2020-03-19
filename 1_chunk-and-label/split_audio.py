@@ -2,10 +2,15 @@ from pydub import AudioSegment
 from pydub.utils import mediainfo
 
 from math import ceil, log10
+import sys
 
 # Split file
 # source_file is the filename of the audio we will be splitting
 def split_file(source_file, output_directory="output"):
+    child_ID = sys.argv[1]
+    birth_date = sys.argv[2]
+
+
     # This is the audio input which we will be splitting
     sound = AudioSegment.from_file(source_file)
 
@@ -35,8 +40,8 @@ def split_file(source_file, output_directory="output"):
 
 
 ###when hard coding add id and age in here
-    child_id = '1006'
-    child_age = '_060015_'
+    #child_id = '1006'
+    #child_age = '_060015_'
 
     # Loop through every minute of the audio and output it into the folder
     #  output as "output{n}.wav" where {n} = the minute id (starts at minute 0)
@@ -44,7 +49,7 @@ def split_file(source_file, output_directory="output"):
 
     #changing the naming system of the file
     #output_format = "%s/output%0"+str(name_size)+"d" 
-    output_format = '%s/'+ child_id + child_age + "%0"+str(name_size) +"d" 
+    output_format = '%s/'+ child_ID + '_' + birth_date + '_' + "%0"+str(name_size) +"d" 
 
 
     for i in range(minutes):
