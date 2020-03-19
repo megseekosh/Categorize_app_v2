@@ -66,7 +66,7 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 3. Begin annotation
 
-	Again on the command line, run the annotation application. You will be prompted to select a `config.csv` file so it does not matter where `categorize_app_CDS.py` is stored on your machine
+	Again on the command line, run the annotation application `categorize_app_CDS.py`. You will be prompted to select a `config.csv` file so it does not matter where `categorize_app_CDS.py` is stored on your machine
 	
 	`python3 categorize_app_CDS.py`
 	
