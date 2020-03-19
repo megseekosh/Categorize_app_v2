@@ -17,22 +17,23 @@ GUI to chop, categorize, and annotate audio clips from daylong recordings. This 
 	  - runs standard vocal activity detector (Usoltsev, 2015)
 	  - Creates accompanying metadata file `config.csv` which contains % vocal acvitity, timestamp of clip in original file, speaker metadata, filename, etc.
 	  
-	
- 2_categorize_app_biling.py - GUI to walk research assistants through annotatating clips derived from 1_chunk-and-label. Includes annotation options for language choice, speaker, and presence/absence of media. Categorize_app creates new file `responses.csv` that records annotations made through application + speaker and file metadata. 
+`2_categorize_app_biling.py` - GUI to walk research assistants through annotatating clips derived from `1_chunk-and-label/`. Includes annotation options for language choice, speaker, and presence/absence of media. Categorize_app creates new file `responses.csv` that records annotations made through application + speaker and file metadata. 
  
- 2_categorize_app_CDS.py - same as above, but additionally includes a child-directed speech versus other-directed speech category 
-
-### To compute bilingual dominance
+ `2_categorize_app_CDS.py` - same as above, but additionally includes a child-directed speech versus other-directed speech category 
+ 
+### To estimate ambient language characteristics
 
 Several notebooks to reliably estimate ambient language characteristics of daylong audio recordings. 
 
-3a_bilingual_ratio.ipynb - estimates the ratio between language categories for a given speaker using `responses.csv` from 2_categorize_app_biling.py or 2_categorize_app_CDS.py
+`3a_bilingual_ratio.ipynb` - estimates the ratio between language categories for a given speaker using `responses.csv` from `2_categorize_app_biling.py` or `2_categorize_app_CDS.py`.
 
-3b_speech_ratio.ipynb - estimates the ratio between type of speech categories (CDS, ODS) for a given speaker using `responses.csv` from 2_categorize_app_CDS.py
+`3b_speech_ratio.ipynb` - estimates the ratio between type of speech categories (CDS, ODS) for a given speaker using `responses.csv` from `2_categorize_app_CDS.py`
 
-4_rater_reliability.ipynb - estimates intra- and inter-rater agreement for language annotation on the basis of clips annotated two and three times. Also concatenates all clips annotated as 'unsure' into `filename_relisten.csv` to be fed into the Relisten application and listened to again.
+`4_rater_reliability.ipynb` - estimates intra- and inter-rater agreement for language annotation on the basis of clips annotated two and three times. Also concatenates all clips annotated as 'unsure' into `filename_relisten.csv` to be fed into the Relisten application and listened to again by two annotators.
 
-5_relisten_app.py - to appear; draws all files that appear in the `filename_relisten.csv` dataframe to listen to again (without replacement)
+`5_relisten_app.py` - to appear; draws all files that appear in the `filename_relisten.csv` dataframe to listen to again (without replacement)
+
+`collect_responses.py` - to appear; a script that will collect all of the `responses.csv` files from all of the coded participants and concatenate them together in a single .csv for analysis
 
 ## Example Work Flow
 
