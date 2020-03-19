@@ -84,7 +84,7 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 	Press "Play." Various metadata details will display in the command line. After the clip, make your selection from the menus and hit "Next" or "Repeat". You can repeat as many times as you would like. To play the next clip in your current annotation session, always press "Next." 
 	
-	When you have completed with that annotation session, you can close the application and restart at any time. 
+	When you have completed with that annotation session, you can close the application and restart at any time. There is nothing else that you have to do. Your responses will always be recorded in `responses.csv`
 	
 4. After you have annotated for a while, you may be interested in your progress. The next step is to run a notebook to evaluate when the ratio between annotation categories has asymptoted for a given recording, indicating that you can stop annotation. An example of this for language annotations in bilingual environments and speech type choices (e.g. child-directed speech) is the following:
 
