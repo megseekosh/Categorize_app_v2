@@ -36,7 +36,7 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 
 	On the command line, type the following:
 	
-	`sox filename whiteNoise16.wav filename whiteNoise16.wav filename whiteNoise16.wav new_name_of_combined_files.wav` 
+	`sox filename whiteNoise16.wav filename new_name_of_combined_files.wav` 
 
 2. Run the chopper and vocal activity detector
 
