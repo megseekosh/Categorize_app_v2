@@ -11,26 +11,32 @@ GUI to chop, categorize, and annotate audio clips from daylong recordings. This 
 
 ### To prepare daylong audio recordings for annotation and annotate them
 
-  1_chunk-and-label - a chopper + vocal activity dectector
+  `1_chunk-and-label/`
+  	  - a chopper + vocal activity dectector
           - chops longform recordings into 30 second clips
 	  - runs standard vocal activity detector (Usoltsev, 2015)
-	  - Creates accompanying metadata file `config.csv` which contains % vocal acvitity, timestamp of clip in original file, speaker metadata, filename, etc. 
+	  - Creates accompanying metadata file `config.csv` which contains % vocal acvitity, timestamp of clip in original file, speaker metadata, filename, etc.
 	  
-	  TODO: LIST all contents inside chunk-and-label
 	
- 2_categorize_app.py - GUI to walk research assistants through annotatating clips derived from 1_chunk-and-label. Categorize_app creates new file `responses.csv` that records annotations made through application + speaker and file metadata. 
+ 2_categorize_app_biling.py - GUI to walk research assistants through annotatating clips derived from 1_chunk-and-label. Includes annotation options for language choice, speaker, and presence/absence of media. Categorize_app creates new file `responses.csv` that records annotations made through application + speaker and file metadata. 
+ 
+ 2_categorize_app_CDS.py - same as above, but additionally includes a child-directed speech versus other-directed speech category 
 
 ### To compute bilingual dominance
 
-Several notebooks to reliably estimate the bilingual dominance of speakers from daylong audio recordings. 
+Several notebooks to reliably estimate ambient language characteristics of daylong audio recordings. 
 
-3_bilingual_ratio.ipynb - estimates the ratio between language categories for a given speaker using `responses.csv` from 2_categorize_app.py
+3a_bilingual_ratio.ipynb - estimates the ratio between language categories for a given speaker using `responses.csv` from 2_categorize_app_biling.py or 2_categorize_app_CDS.py
+
+3b_speech_ratio.ipynb - estimates the ratio between type of speech categories (CDS, ODS) for a given speaker using `responses.csv` from 2_categorize_app_CDS.py
 
 4_rater_reliability.ipynb - estimates intra- and inter-rater agreement for language annotation on the basis of clips annotated two and three times. Also concatenates all clips annotated as 'unsure' into `filename_relisten.csv` to be fed into the Relisten application and listened to again.
 
 5_relisten_app.py - to appear; draws all files that appear in the `filename_relisten.csv` dataframe to listen to again (without replacement)
 
 ## Example Work Flow
+
+This is an example of a workflow to get you from a full daylong recording to annotation for ambient language characteristics like language choice and speech type via random sampling. It assumes that you have all relevant libraries and contingencies installed. 
 
 1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise such as `whiteNoise16.wav` (included in this repo). Interspersing white noise allows the annotator to know if a new recording has begun in the middle of a clip. 
 
@@ -40,9 +46,9 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 
 2. Run the chopper and vocal activity detector
 
-	Using the command line, move inside of `1_chunk-and-label/` and run the following:
+	Using the command line, move inside of `1_chunk-and-label/` and run the following where childID is the ID of the participant (any length or format) birthdate is DDMMYYYY, recordingdate is DDMMYYYY, and gender is any way that you would like to code participant gender (e.g. 'Female', 'Non-binary', etc.). 
 	
-	`python3 split_app.py`
+	`python3 split_app.py childID birthdate recordingdate gender`
 	
 	You will be prompted with a window to select an audio file on your local machine to process:
 	
