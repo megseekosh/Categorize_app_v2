@@ -36,7 +36,7 @@ Several notebooks to reliably estimate ambient language characteristics of daylo
 
 ## Example Work Flow
 
-This is an example of a workflow to get you from a full daylong recording to annotation for ambient language characteristics like language choice and speech type via random sampling. It assumes that you have all relevant libraries and contingencies installed. 
+This is an example of a workflow to get you from a full daylong recording to one annotated for ambient language characteristics like language choice and speech type via random sampling. It assumes that you have all relevant libraries and contingencies installed. 
 
 1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise such as `whiteNoise16.wav` (included in this repo). Interspersing white noise allows the annotator to know if a new recording has begun in the middle of a clip. 
 
@@ -46,9 +46,13 @@ This is an example of a workflow to get you from a full daylong recording to ann
 
 2. Run the chopper and vocal activity detector
 
-	Using the command line, move inside of `1_chunk-and-label/` and run the following where childID is the ID of the participant (any length or format) birthdate is DDMMYYYY, recordingdate is DDMMYYYY, and gender is any way that you would like to code participant gender (e.g. 'Female', 'Non-binary', etc.). 
+	Using the command line, move inside of `1_chunk-and-label/` and run the following where childID is the ID of the participant (any length or format), birthdate is DDMMYYYY, recordingdate is DDMMYYYY, and gender is any way that you would like to code participant gender (e.g. 'Female', 'Non-binary', etc.). 
 	
 	`python3 split_app.py childID birthdate recordingdate gender`
+	
+	An example of this is the following:
+	
+	`python3 split_app.py 6396 06122018 05152019 female`
 	
 	You will be prompted with a window to select an audio file on your local machine to process:
 	
