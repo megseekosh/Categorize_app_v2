@@ -32,11 +32,11 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 
 ## Example Work Flow
 
-1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise such as `whiteNoise16.wav` which is included in this repo. Interspersing white noise allows the annotator to know if a new recording has begun in the middle of a clip. 
+1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise such as `whiteNoise16.wav` (included in this repo). Interspersing white noise allows the annotator to know if a new recording has begun in the middle of a clip. 
 
 	On the command line, type the following:
 	
-	`sox filename whiteNoise16.wav filename new_name_of_combined_files.wav` 
+	`sox filename1.wav whiteNoise16.wav filename2.wav new_name_of_combined_files.wav` 
 
 2. Run the chopper and vocal activity detector
 
@@ -46,7 +46,7 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 	
 	You will be prompted with a window to select an audio file on your local machine to process:
 	
-	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/audio_cut_prompt.png "audio file prompt")
+	![alt text](https://github.com/megseekosh/_v2/blob/master/audio_cut_prompt.png "audio file prompt")
 	
 	You will be prompted with a window to select a directory to store the chopped files and generated `config.csv` file:
 	
@@ -56,11 +56,11 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 	
 3. Begin annotation
 
-	Again on the command line, run the annotation application. You will be prompted to select a `config.csv` file so it does not matter where `categorize_app.py` is stored on your machine
+	Again on the command line, run the annotation application. You will be prompted to select a `config.csv` file so it does not matter where `categorize_app_CDS.py` is stored on your machine
 	
-	`python3 categorize_app.py`
+	`python3 categorize_app_CDS.py`
 	
-	You will be prompted with a window to select a metadata file (`config.csv`):
+	You will be prompted with a window to select the metadata file that you previously created (`config.csv`):
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/metadata_prompt.png "metadata_prompt")
 
@@ -71,10 +71,20 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 	The main interactive window will appear, which can be easily modified in the source code according to your annotation goals. In the current example, the following window is displayed:
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/annotation_window.png "annotation_window")
-
-
 	
-4. 
+	Press "Play." Various metadata details will display in the command line. After the clip, make your selection from the menus and hit "Next" or "Repeat". To play future clips in your current annotation session, only press "Next." 
+	
+	When you have completed with that annotation session, you can close the application and restart at any time. 
+	
+4. After you have annotated for a while, you may be interested in your progress. The next step is to run a notebook to evaluate when the ratio between annotation categories has asymptoted for a given recording, indicating that you can stop annotation. An example of this for language annotations in bilingual environments and speech type choices (e.g. child-directed speech) is the following:
+
+	Move to the directory where you are storing `3a_bilingual_ratio.ipynb` and/or `3b_speech_ratio.ipynb` and type:
+	
+	`jupyter notebook`
+	
+	Select the notebook you would like to use from the webpage. 
+	
+	In the second cell of the notebook, write the path name to the `responses.csv` file for the participant. Run the notebook and evaluate your progress. 
 
 ## Citations
 
