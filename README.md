@@ -94,7 +94,14 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 	Select the notebook you would like to use from the webpage. 
 	
-	In the second cell of the notebook, write the path name to the `responses.csv` file on your computer for the participant. Run the notebook and evaluate your progress. 
+	In the second cell of the notebook, write the path name to the `responses.csv` file on your computer for the participant. 
+	
+	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/path_cell.png "path_cell")
+
+	Run the remainder of the notebook and evaluate your progress. For example, the following area plot demonstrates that the language categories have stablized for this participant:
+	
+	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/stable_area_plot.png "stable_area_plot")
+	
 
 ## Citations
 
