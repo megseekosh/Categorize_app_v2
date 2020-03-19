@@ -58,7 +58,7 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/audio_cut_prompt.png "audio file prompt")
 	
-	You will be prompted with a window to select a directory to store the chopped files and generated `config.csv` file:
+	You will be then prompted with a window to select a directory to store the chopped files and generated `config.csv` file:
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/output_directory_prompt.png "output_directory_prompt")
 	
