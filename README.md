@@ -46,7 +46,7 @@ Several notebooks to reliably estimate the bilingual dominance of speakers from 
 	
 	You will be prompted with a window to select an audio file on your local machine to process:
 	
-	![alt text](https://github.com/megseekosh/_v2/blob/master/audio_cut_prompt.png "audio file prompt")
+	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/audio_cut_prompt.png "audio file prompt")
 	
 	You will be prompted with a window to select a directory to store the chopped files and generated `config.csv` file:
 	
