@@ -73,7 +73,7 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 	Mark all of the clips where you believe the child to be sleeping with a `1` and all of the remaining clips with `0`. 
 	
-	Now when you annotate, you will continue to draw clips where the child is sleeping. However, you will not have to listen to them. Instead you will be prompted with the message `Child is sleeping. Press Next.` on the command line.
+	Now when you annotate, you will continue to draw clips where the child is sleeping. However, you will not have to listen to them. Instead you will be prompted with the message `Child is sleeping. Press Next.` on the command line. So press next!
 	
 4. Begin annotation
 
