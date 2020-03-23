@@ -39,7 +39,7 @@ Several notebooks to reliably estimate ambient language characteristics of daylo
 
 This is an example of a workflow to get you from a full daylong recording to one annotated for ambient language characteristics like language choice and speech type via random sampling. It assumes that you have all relevant libraries and contingencies installed. 
 
-1. If you have multiple .wav files from a given day, sew them together and intersperse with white noise such as `whiteNoise16.wav` (included in this repo). Interspersing white noise allows the annotator to know if a new recording has begun in the middle of a clip. 
+1. (Optional) If you have multiple .wav files from a given day, sew them together and intersperse with white noise such as `whiteNoise16.wav` (included in this repo). Interspersing white noise allows the annotator to know if a new recording has begun in the middle of a clip. 
 
 	On the command line, type the following:
 	
@@ -65,7 +65,17 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 	The speed of the VAD depends on your machine, but a good estimate is 1 second/clip or 24 minutes for a 12 hour recording. 
 	
-3. Begin annotation
+3. (Optional) Delimit parts of the recording that you may not want to annotate. 
+
+	For example, you may not want to listen to any clips where the child is sleeping or where the researcher is present in the recording. That would be a waste of your time. The following example is our approach to finding and eliminating clips where the child is sleeping. You can always modify the source code of `split_app.py` to add additional parameters. 
+	
+	Open `config.csv` and note in the `percents_voc` column the clips that have a very, very low percentage of vocal activity (in the realm of 0-7%). Listen to the parts of the recording with this low activity/compare the timestamps to daily activity logs (if you have them) to ensure that the child is in fact sleeping. 
+	
+	Mark all of the clips where you believe the child to be sleeping with a `1` and all of the remaining clips with `0`. 
+	
+	Now when you annotate, you will continue to draw clips where the child is sleeping. However, you will not have to listen to them. Instead you will be prompted with the message `Child is sleeping. Press Next.` on the command line.
+	
+4. Begin annotation
 
 	Again on the command line, run the annotation application `2_categorize_app_CDS.py`. You will be prompted to select a `config.csv` file so it does not matter where `2_categorize_app_CDS.py` is stored on your machine.
 	
@@ -87,7 +97,7 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 	When you have completed with that annotation session, you can close the application and restart at any time. There is nothing else that you have to do. Your responses will always be recorded in `responses.csv`
 	
-4. After you have annotated for a while, you may be interested in your progress. The next step is to run a notebook to evaluate when the ratio between annotation categories has asymptoted for a given recording, indicating that you can stop annotation. An example of this for language annotations in bilingual environments and speech type choices (e.g. child-directed speech) is the following:
+5. After you have annotated for a while, you may be interested in your progress. The next step is to run a notebook to evaluate when the ratio between annotation categories has asymptoted for a given recording, indicating that you can stop annotation. An example of this for language annotations in bilingual environments and speech type choices (e.g. child-directed speech) is the following:
 
 	Move to the directory where you are storing `3a_bilingual_ratio.ipynb` and/or `3b_speech_ratio.ipynb` and type:
 	
