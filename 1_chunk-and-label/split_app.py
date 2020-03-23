@@ -121,7 +121,7 @@ def select_and_slice_file():
         writer = csv.writer(output, delimiter=',')
 
         #this makes the header for the rows 
-        writer.writerow(['file_name', 'id', 'age_YYMMDD', 'date_YYYYMMDD', 'gender', 'timestamp_HHMMSS', 'percents_voc', 'researcher_present'])
+        writer.writerow(['file_name', 'id', 'age_YYMMDD', 'date_YYYYMMDD', 'gender', 'timestamp_HHMMSS', 'percents_voc', 'researcher_present', 'is_sleeping'])
 
         #information for the rows 
         #percents actually contains everything for all information

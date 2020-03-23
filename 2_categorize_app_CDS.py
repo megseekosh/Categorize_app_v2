@@ -32,6 +32,7 @@ resp_df = None
 
 
 
+
 # clear category selection   
 def clear():
     #mediacat.set(0)
@@ -101,6 +102,9 @@ def annotatorinfo():
 #index and play audio file aloud
 def play_audio():
 
+    global repeat_ct
+    repeat_ct = 0 
+
     global row
     global audiofile
     row = df.sample(n=1).iloc[0] # just randomly sample from entire df
@@ -108,6 +112,8 @@ def play_audio():
     	print('Researcher present in recording. Press Next.')
     elif row['percents_voc']==0: # if no vocal activity, skip the clip
         print('No vocal activity in clip. Press Next.')
+    elif row['is_sleeping']==1: # if child is sleeping
+        print('Child is sleeping. Press Next.')
    
     else:
         audiofile = os.path.join(row.outdir, row.file_name)
@@ -122,6 +128,9 @@ def play_audio():
 #go to the next audio file 
 def next_audio():
 
+    global repeat_ct
+
+
     language = langcategory.get() # get the language classification
     speech = speechcategory.get() # get the speech classification
     speaker = speakercategory.get() # get the speaker classification
@@ -133,18 +142,26 @@ def next_audio():
 
     global row
     global resp_df
-    allcols = pd.DataFrame([row]).assign(Language=language, Speech=speech, Speaker=speaker, Media=media, annotate_date_YYYYMMDD=annotate_date_YYYYMMDD, annotator=content) 
+    allcols = pd.DataFrame([row]).assign(Language=language, Speech=speech, Speaker=speaker, Media=media, annotate_date_YYYYMMDD=annotate_date_YYYYMMDD, annotator=content, repeats=int(repeat_ct)) 
     resp_df = pd.concat([resp_df, allcols], sort=True)
     resp_df.to_csv(os.path.join(outdir, "responses.csv"), index=False)  # yes, this overwrites responses.csv each time  
 
     global idx 
     idx += 1 # update the global idx
 
+    repeat_ct = 0 
+
     play_audio()
 
 
+	
 def repeat():
+
 	subprocess.call(["play", audiofile])
+
+	global repeat_ct
+
+	repeat_ct = repeat_ct + 1
 
 
 
