@@ -47,13 +47,13 @@ This is an example of a workflow to get you from a full daylong recording to one
 
 2. Run the chopper and vocal activity detector
 
-	Using the command line, move inside of `1_chunk-and-label/` and run the following where childID is the ID of the participant (any length or format), birthdate is DDMMYYYY, recordingdate is DDMMYYYY, and gender is any way that you would like to code participant gender (e.g. 'Female', 'Non-binary', etc.). 
+	Using the command line, move inside of `1_chunk-and-label/` and run the following where childID is the ID of the participant (any length or format), birthdate is YYYYMMDD, recordingdate is YYYYMMDD, and gender is any way that you would like to code participant gender (e.g. 'Female', 'Non-binary', etc.). 
 	
 	`python3 split_app.py childID birthdate recordingdate gender`
 	
 	An example of this is the following:
 	
-	`python3 split_app.py 6396 06122018 05152019 female`
+	`python3 split_app.py 6396 20180612 20190515 female`
 	
 	After starting the application, you will be prompted with a window to select an audio file on your local machine to process:
 	
