@@ -189,7 +189,7 @@ def main():
 
 	langchoices = {"Spanish", "English/Quechua", "Mixed", "Unsure", "No speech", "PID"}
 	speech_choices = {"ODS", "CDS", "Both", "Unsure"}
-	speaker_choices = {"Single Adult Male", "Single Adult Female", "Multiple Adults", "Target Child", "Other Child(ren)", "Target Child & Adult(s)", "Other Child & Adult(s)", "Target Child & Other Child(ren)",  "Unsure", "Researcher"}
+	speaker_choices = {"Single Adult Male", "Single Adult Female", "Multiple Adults", "Target Child", "Other Child(ren)", "Target Child & Adult(s)", "Other Child(ren) & Adult(s)", "Target Child & Other Child(ren)",  "Unsure", "Researcher"}
 	media_choices = {"No media", "Spanish", "Quechua", "Mixed", "Unsure", "No Language"}
 
 
