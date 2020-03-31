@@ -116,4 +116,4 @@ This is an example of a workflow to get you from a full daylong recording to one
 
 ## Citations
 
-Usoltsev, A. Voice Activity Detector-Python. GitHub Repository. https://github.com/marsbroshok/VAD-python
+Usoltsev, A. (2015). Voice Activity Detector-Python. GitHub Repository. https://github.com/marsbroshok/VAD-python
