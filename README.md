@@ -10,9 +10,9 @@ GUI to chop, categorize, and annotate audio clips from daylong recordings. This 
 ## Dependencies 
 The following dependencies are required to run the applications and scripts in this repo: `ffprobe`, `ffmpeg`, (both available [here](https://evermeet.cx/ffmpeg/)), `pydub`, `matplotlib`, `scipy`, and `pandas`. In addition, this repo is configured for Python 3.7.0 or older. That doesn't mean it's unworkable with newer versions, but you will likely have to create some work arounds. One solution is to configure a Python 3.7.0 environment within Anaconda:
 
-	`conda create --name py37 python=3.7.0 pip`
+	conda create --name py37 python=3.7.0 pip
 
-	`conda activate py37`
+	conda activate py37
 
 ## Description of Materials In The Repo
 
