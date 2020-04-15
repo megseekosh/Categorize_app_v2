@@ -36,14 +36,36 @@ resp_df = None
 
 # clear category selection   
 def clear():
-    speaker1category.set("Categorize adult speaker(s)")
-    lang1category.set("Categorize adult language")
-    speech1category.set("Categorize adult speech")
-    #speaker2category.set("Categorize speaker 2")
-    lang2category.set("Categorize child language")
-    speech2category.set("Categorize child speech")
+    beginoptionscat.set("Is there speech in the clip?")
+
+
+
+    adultTCcat.set("Categorize language to target child")
+    adultOCcat.set("Categorize language to other child(ren)")
+    adultOtherscat.set("Categorize language to other adults")
+    adultUnsurecat.set("Categorize language to someone unknown")
+    
+
+
+    childTCcat.set("Categorize language to target child")
+    childOCcat.set("Categorize language to other child(ren)")
+    childOtherscat.set("Categorize language to other adults")
+    childUnsurecat.set("Categorize language to someone unknown")
+    
+
+
     mediacategory.set("Categorize media")
+    
+
+
     childvoccat.set(0)
+    adultfemalecat.set(0)
+    adultmalecat.set(0)
+    adultscat.set(0)
+    unsurecat.set(0)
+    PIDcat.set(0)
+
+
 
 
 
@@ -116,7 +138,7 @@ def play_audio():
     	print('Researcher present in recording. Press Next.')
     elif row['percents_voc']==0: # if no vocal activity, skip the clip
         print('No vocal activity in clip. Press Next.')
-    elif row['is_sleeping']==1: # if child is sleeping
+    elif row['sleeping']==1: # if child is sleeping
         print('Child is sleeping. Press Next.')
    
     else:
@@ -134,22 +156,35 @@ def next_audio():
 
     global repeat_ct
 
+    beginoptions = beginoptionscat.get() # get the speaker classification
+    
+    adult_tc = adultTCcat.get() # get the classification
+    adult_oc = adultOCcat.get() 
+    adult_others = adultOtherscat.get() 
+    adult_unsure = adultUnsurecat.get() 
+    
+    
+    OC_tc = childTCcat.get() 
+    OC_oc = childOCcat.get() 
+    OC_others = childOtherscat.get() 
+    OC_unsure = childUnsurecat.get() 
+    
 
-    speaker1 = speaker1category.get() # get the speaker classification
-    language1 = lang1category.get() # get the language classification
-    speech1 = speech1category.get() # get the speech classification
-    #speaker2 = speaker2category.get() # get the speaker classification
-    language2 = lang2category.get() # get the language classification
-    speech2 = speech2category.get() # get the speech classification
     media = mediacategory.get() # get the media classification
-
     childvoc = childvoccat.get() # 0=absent, 1=present
+    adultfemale = adultfemalecat.get() 
+    adultmale = adultmalecat.get() 
+    adults = adultscat.get() 
+    unsure = unsurecat.get() 
+    PID = PIDcat.get()
+
+
     annotate_date_YYYYMMDD = datetime.datetime.now() # get current annotation time
-    print(speaker1, language1, speech1, language2, speech2, media, childvoc, annotate_date_YYYYMMDD, content) 
+    print(beginoptions, adult_tc, adult_oc, adult_others, adult_unsure, OC_tc, OC_oc, OC_others, OC_unsure, media, childvoc, adultfemale, adultmale, adults, unsure, PID, annotate_date_YYYYMMDD, content) 
 
     global row
     global resp_df
-    allcols = pd.DataFrame([row]).assign(Adult_Speaker=speaker1, Adult_Language=language1, Adult_Speech=speech1, Other_Child_Language=language2, Other_Child_Speech=speech2, Media=media, Childvoc=childvoc, annotate_date_YYYYMMDD=annotate_date_YYYYMMDD, annotator=content, repeats=repeat_ct) 
+    allcols = pd.DataFrame([row]).assign(beginoptions=beginoptions, Adult2TargetChild=adult_tc, Adult2OtherChild=adult_oc, Adult2Others=adult_others, Adult2unsure=adult_unsure, Otherchild2TargetChild=OC_tc, Otherchild2OtherChild=OC_oc, Otherchild2others=OC_others, Otherchild2unsure=OC_unsure, Media=media, Childvoc=childvoc, Adultfemale=adultfemale, Adultmale=adultmale, Multiple_adults=adults, Unsure_adults=unsure, PID=PID, annotate_date_YYYYMMDD=annotate_date_YYYYMMDD, annotator=content, repeats=repeat_ct) 
     resp_df = pd.concat([resp_df, allcols], sort=True)
     resp_df.to_csv(os.path.join(outdir, "responses.csv"), index=False)  # yes, this overwrites responses.csv each time  
 
@@ -173,14 +208,23 @@ def repeat():
 
 
 def main():
-	global speaker1category
-	global lang1category
-	global speech1category
-	#global speaker2category
-	global lang2category
-	global speech2category
+	global beginoptionscat
+	global adultTCcat
+	global adultOCcat
+	global adultOtherscat
+	global adultUnsurecat
+	global childTCcat
+	global childOCcat
+	global childOtherscat
+	global childUnsurecat	
 	global mediacategory
 	global childvoccat
+	global adultfemalecat
+	global adultmalecat
+	global adultscat
+	global unsurecat
+	global PIDcat
+
 
 	root = tk.Tk() # refers to annotation window 
 
@@ -191,72 +235,131 @@ def main():
 	frame = tk.Frame(root, bg="white")
 	frame.grid(row=15, column=15)
 
-	speaker1category = tk.StringVar()
-	lang1category = tk.StringVar() 
-	speech1category = tk.StringVar()
-	#speaker2category = tk.StringVar()
-	lang2category = tk.StringVar() 
-	speech2category = tk.StringVar()
+	beginoptionscat = tk.StringVar()
+
+	adultTCcat = tk.StringVar()
+	adultOCcat = tk.StringVar() 
+	adultOtherscat = tk.StringVar()
+	adultUnsurecat = tk.StringVar()
+	childTCcat = tk.StringVar() 
+	childOCcat = tk.StringVar()
+	childOtherscat = tk.StringVar()
+	childUnsurecat = tk.StringVar()
+
+
 	mediacategory = tk.StringVar()
 
 
-	speaker1_choices = {"Single Adult Male", "Single Adult Female", "Multiple Adults", "Unsure", "Researcher", "PID", "No speech"}
-	langchoices = {"Spanish", "English/Quechua", "Mixed", "Unsure"}
-	speech_choices = {"ODS", "CDS", "Both", "Unsure"}
-	#speaker2_choices = {"Other Child(ren)", "Unsure"}
+	beginoptions_choices = {"No speech", "Unsure speaker and unsure language"}
+	
+	lang_choices = {"Spanish", "English/Quechua", "Mixed", "Unsure"}
+	
 	media_choices = {"No media", "Spanish", "Quechua", "Mixed", "Unsure", "No Language"}
 
+	beginoptionscat.set("Categorize clip")
 
-	speaker1category.set("Categorize adult speaker")
-	lang1category.set("Categorize adult language")
-	speech1category.set("Categorize adult speech")
-	#speaker2category.set("Categorize child speaker")
-	lang2category.set("Categorize child language")
-	speech2category.set("Categorize child speech")
+	adultTCcat.set("Categorize speech to target child")
+	adultOCcat.set("Categorize speech to other child(ren)")
+	adultOtherscat.set("Categorize speech to other adults")
+	adultUnsurecat.set("Categorize speech to unknown")
+	childTCcat.set("Categorize speech to target child")
+	childOCcat.set("Categorize speech to other child(ren)")
+	childOtherscat.set("Categorize speech to other adults")
+	childUnsurecat.set("Categorize speech to unknown")
+
+	
 	mediacategory.set("Categorize media")
 
 
-	popupMenu = tk.OptionMenu(frame, speaker1category, *speaker1_choices)
-	popupMenu1 = tk.OptionMenu(frame, lang1category, *langchoices)
-	popupMenu2 = tk.OptionMenu(frame, speech1category, *speech_choices)
-	#popupMenu3 = tk.OptionMenu(frame, speaker2category, *speaker2_choices)
-	popupMenu4 = tk.OptionMenu(frame, lang2category, *langchoices)
-	popupMenu5 = tk.OptionMenu(frame, speech2category, *speech_choices)
+	popupMenu0 = tk.OptionMenu(frame, beginoptionscat, *beginoptions_choices)
+	
+	popupMenu = tk.OptionMenu(frame, adultTCcat, *lang_choices)
+	popupMenu1 = tk.OptionMenu(frame, adultOCcat, *lang_choices)
+	popupMenu2 = tk.OptionMenu(frame, adultOtherscat, *lang_choices)
+	popupMenu3 = tk.OptionMenu(frame, adultUnsurecat, *lang_choices)
+	popupMenu4 = tk.OptionMenu(frame, childTCcat, *lang_choices)
+	popupMenu5 = tk.OptionMenu(frame, childOCcat, *lang_choices)
+	popupMenu7 = tk.OptionMenu(frame, childOtherscat, *lang_choices)
+	popupMenu8 = tk.OptionMenu(frame, childUnsurecat, *lang_choices)
 	popupMenu6 = tk.OptionMenu(frame, mediacategory, *media_choices)
 
-	popupMenu.grid(row=4, column=1)
-	popupMenu1.grid(row=5, column=1)
-	popupMenu2.grid(row=6, column=1)
-	#popupMenu3.grid(row=8, column=1)
-	popupMenu4.grid(row=8, column=1)
-	popupMenu5.grid(row=9, column=1)
-	popupMenu6.grid(row=11, column=1)
+	popupMenu0.grid(row=3, column=1)
+	
+	popupMenu.grid(row=5, column=1)
+	popupMenu1.grid(row=6, column=1)
+	popupMenu2.grid(row=7, column=1)
+	popupMenu3.grid(row=8, column=1)
+	popupMenu4.grid(row=11, column=1)
+	popupMenu5.grid(row=12, column=1)
+	popupMenu7.grid(row=13, column=1)
+	popupMenu8.grid(row=14, column=1)
+
+	
+	popupMenu6.grid(row=16, column=1)
 
 
 	fontStyle = tkFont.Font(family="Lucida Grande", size=16, weight="bold")
 
-	tk.Label(frame, font=fontStyle, text="Classify adults").grid(row=3, column=0)
+	tk.Label(frame, font=fontStyle, text="Classify clip").grid(row=3, column=0)
 
-	tk.Label(frame, text="Adult Speaker(s): ").grid(row = 4, column = 0)
-	tk.Label(frame, text="Adult Language: ").grid(row = 5, column = 0)
-	tk.Label(frame, text="Adult Speech: ").grid(row = 6, column = 0)
-
-	tk.Label(frame, font=fontStyle, text="Classify other children").grid(row=7, column=0)
-
-	#tk.Label(frame, text="Other Child Speaker(s): ").grid(row = 8, column = 0)
-	tk.Label(frame, text="Other Child Language: ").grid(row = 8, column = 0)
-	tk.Label(frame, text="Other Child Speech: ").grid(row = 9, column = 0)
 	
-	tk.Label(frame, font=fontStyle, text="Classify media").grid(row=10, column=0)
-
-	tk.Label(frame, text="Media: ").grid(row = 11, column = 0)
 
 
-	tk.Label(frame, font=fontStyle, text="Classify target child").grid(row=12, column=0)
+	tk.Label(frame, font=fontStyle, text="Classify adults").grid(row=4, column=0)
+	tk.Label(frame, text="Adult(s) to target child: ").grid(row = 5, column = 0)
+	tk.Label(frame, text="Adult(s) to other child(ren): ").grid(row = 6, column = 0)
+	tk.Label(frame, text="Adult(s) to other adult(s): ").grid(row = 7, column = 0)
+	tk.Label(frame, text="Adult(s) to unknown: ").grid(row = 8, column = 0)
 
-	tk.Label(frame, text="Is the child vocalizing?").grid(row=13, column=0)
+
+
+	tk.Label(frame, text="Classify the adult(s) speaking:").grid(row=9, column=0)
+	adultfemalecat = tk.IntVar()
+	tk.Checkbutton(frame, text='Adult Female', variable=adultfemalecat).grid(row=9, column=1)
+
+
+	adultmalecat = tk.IntVar()
+	tk.Checkbutton(frame, text='Adult Male', variable=adultmalecat).grid(row=9, column=2)
+
+
+	adultscat = tk.IntVar()
+	tk.Checkbutton(frame, text='Multiple adults', variable=adultscat).grid(row=9, column=3)
+
+	unsurecat = tk.IntVar()
+	tk.Checkbutton(frame, text='Unsure', variable=unsurecat).grid(row=9, column=4)
+
+
+
+
+
+
+
+	tk.Label(frame, font=fontStyle, text="Classify other children").grid(row=10, column=0)
+
+	tk.Label(frame, text="Child to target child: ").grid(row = 11, column = 0)
+	tk.Label(frame, text="Child to other child(ren): ").grid(row = 12, column = 0)
+	tk.Label(frame, text="Child to adult(s): ").grid(row = 13, column = 0)
+	tk.Label(frame, text="Child to unknown: ").grid(row = 14, column = 0)
+
+	
+	tk.Label(frame, font=fontStyle, text="Classify media").grid(row=15, column=0)
+
+	tk.Label(frame, text="Media: ").grid(row = 16, column = 0)
+
+
+	tk.Label(frame, font=fontStyle, text="Classify target child").grid(row=17, column=0)
+	tk.Label(frame, text="Is the child vocalizing?").grid(row=18, column=0)
 	childvoccat = tk.IntVar()
-	tk.Checkbutton(frame, text='Yes', variable=childvoccat).grid(row=13, column=1)
+	tk.Checkbutton(frame, text='Yes', variable=childvoccat).grid(row=18, column=1)
+
+	tk.Label(frame, font=fontStyle, text="PID").grid(row=19, column=0)
+	tk.Label(frame, text="Is there PID in the clip?").grid(row=21, column=0)
+	PIDcat = tk.IntVar()
+	tk.Checkbutton(frame, text='Yes', variable=PIDcat).grid(row=21, column=1)
+
+
+
+
 
 	tk.Button(frame, text="     Play     ", command=combine_funcs(play_audio, clear), bg="gray").grid(row=1, column=0) 
 
