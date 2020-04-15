@@ -36,7 +36,7 @@ resp_df = None
 
 # clear category selection   
 def clear():
-    beginoptionscat.set("Is there speech in the clip?")
+    beginoptionscat.set("No speech/unsure")
 
 
 
@@ -184,7 +184,7 @@ def next_audio():
 
     global row
     global resp_df
-    allcols = pd.DataFrame([row]).assign(beginoptions=beginoptions, Adult2TargetChild=adult_tc, Adult2OtherChild=adult_oc, Adult2Others=adult_others, Adult2unsure=adult_unsure, Otherchild2TargetChild=OC_tc, Otherchild2OtherChild=OC_oc, Otherchild2others=OC_others, Otherchild2unsure=OC_unsure, Media=media, Childvoc=childvoc, Adultfemale=adultfemale, Adultmale=adultmale, Multiple_adults=adults, Unsure_adults=unsure, PID=PID, annotate_date_YYYYMMDD=annotate_date_YYYYMMDD, annotator=content, repeats=repeat_ct) 
+    allcols = pd.DataFrame([row]).assign(beginoptions=beginoptions, Adult2TargetChild=adult_tc, Adult2OtherChild=adult_oc, Adult2Others=adult_others, Adult2unsure=adult_unsure, Adultfemale=adultfemale, Adultmale=adultmale, Multiple_adults=adults, Unsure_adults=unsure, Otherchild2TargetChild=OC_tc, Otherchild2OtherChild=OC_oc, Otherchild2others=OC_others, Otherchild2unsure=OC_unsure, Media=media, Childvoc=childvoc, PID=PID, annotate_date_YYYYMMDD=annotate_date_YYYYMMDD, annotator=content, repeats=repeat_ct) 
     resp_df = pd.concat([resp_df, allcols], sort=True)
     resp_df.to_csv(os.path.join(outdir, "responses.csv"), index=False)  # yes, this overwrites responses.csv each time  
 
@@ -252,7 +252,7 @@ def main():
 
 	beginoptions_choices = {"No speech", "Unsure speaker and unsure language"}
 	
-	lang_choices = {"Spanish", "English/Quechua", "Mixed", "Unsure"}
+	lang_choices = {"Spanish", "English/Quechua", "Mixed", "Unsure", "None"}
 	
 	media_choices = {"No media", "Spanish", "Quechua", "Mixed", "Unsure", "No Language"}
 
