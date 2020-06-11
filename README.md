@@ -34,7 +34,7 @@ Several notebooks to reliably estimate ambient language characteristics of daylo
 
 `3a_bilingual_ratio.ipynb` - estimates the ratio between language categories for a given speaker using `responses.csv` from `2_categorize_app_biling.py` or `2_categorize_app_CDS.py`.
 
-`3b_speech_ratio.ipynb` - estimates the ratio between type of speech categories (CDS, ODS) for a given speaker using `responses.csv` from `2_categorize_app_CDS.py`
+`3b_cds_biling_ratio.ipynb` - estimates the ratio between type of speech categories (CDS, ODS) for a given speaker using `responses.csv` from `2_categorize_app_CDS.py`
 
 `4_rater_reliability.ipynb` - estimates intra- and inter-rater agreement for language annotation on the basis of clips annotated two and three times. Also concatenates all clips annotated as 'unsure' into `filename_relisten.csv` to be fed into the Relisten application and listened to again by two annotators.
 
@@ -106,7 +106,7 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 5. After you have annotated for a while, you may be interested in your progress. The next step is to run a notebook to evaluate when the ratio between annotation categories has asymptoted for a given recording, indicating that you can stop annotation. An example of this for language annotations in bilingual environments and speech type choices (e.g. child-directed speech) is the following:
 
-	Move to the directory where you are storing `3a_bilingual_ratio.ipynb` and/or `3b_speech_ratio.ipynb` and type:
+	Move to the directory where you are storing `3a_bilingual_ratio.ipynb` and/or `3b_cds_biling_ratio.ipynb` and type:
 	
 	`jupyter notebook`
 	
