@@ -24,9 +24,13 @@ The following dependencies are required to run the applications and scripts in t
 	  - runs standard vocal activity detector (Usoltsev, 2015)
 	  - Creates accompanying metadata file `config.csv` which contains % vocal acvitity, timestamp of clip in original file, speaker metadata, filename, etc.
 	  
-`2_categorize_app_biling.py` - GUI to walk research assistants through annotatating clips derived from `1_chunk-and-label/`. Includes annotation options for language choice, speaker, and presence/absence of media. Categorize_app creates new file `responses.csv` that records annotations made through application + speaker and file metadata. 
+`2_categorize_app_biling.py` - GUI to walk research assistants through annotatating clips derived from `1_chunk-and-label/`. Includes annotation options for language choice, speaker, and presence/absence of media. Categorize_app creates new file `responses.csv` that records annotations made through application + speaker and file metadata.
+
  
  `2_categorize_app_CDS.py` - same as above, but additionally includes a child-directed speech versus other-directed speech category 
+ 
+  `2_categorize_app_CDS_entire.py` - same as above, but instead samples every other clip from the recording, in chronological order, instead of randomly from the recording
+
  
 ### To estimate ambient language characteristics
 
