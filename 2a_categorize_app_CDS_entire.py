@@ -143,8 +143,8 @@ def play_audio():
     	print('Researcher present in recording. Press Next.')
     elif row['percents_voc']==0: # if no vocal activity, skip the clip
         print('No vocal activity in clip. Press Next.')
-    #elif row['sleeping']==1: # we're still going to listen even if child is sleeping
-        #print('Child is sleeping. Press Next.')
+    elif row['sleeping']==1: # if child is sleeping, skip the clip
+        print('Child is sleeping. Press Next.')
    
     else:
         audiofile = os.path.join(row.outdir, row.file_name)
