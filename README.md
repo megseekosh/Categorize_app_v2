@@ -137,4 +137,8 @@ This is an example of a workflow to get you from a full daylong recording to one
 
 ## Citations
 
+Villaneuva, A., Cychosz, M., & Weisleder, A. (2020). Dual language input from adults and older children in two communities. Poster to given at the Many Paths to Language Acquisition Workshop, Nijmegen, The Netherlands.
+
+Cychosz, M., Villanueva, A., & Weisleder, A. (2020). Efficient estimation of bilingual children’s language exposure from daylong audio recordings. Poster to given at the Many Paths to Language Acquisition Workshop, Nijmegen, The Netherlands.
+
 Usoltsev, A. (2015). Voice Activity Detector-Python. GitHub Repository. https://github.com/marsbroshok/VAD-python
