@@ -127,7 +127,9 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 
 ## Research Output
-  `MPAL_poster` - poster from recent Many Paths to Language Acquisition Conference demosntrating the validity of the random sampling approach
+  `Cychosz_Villaneuva_Weisleder` - poster from recent Many Paths to Language Acquisition Conference demosntrating the validity of the random sampling approach
+  
+  `Villaneuva_Cychosz_Weisleder` - poster from recent Many Paths to Language Acquisition Conference documenting dual language input in the US and Bolivia
   
   `validation_results.Rmd` - R notebook to generate results and analyses for `MPAL_poster`
   
