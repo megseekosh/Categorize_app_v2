@@ -149,7 +149,7 @@ def play_audio():
     
         print(idx, row.file_name) # keep us updated about progress in terminal 
 
-        subprocess.call(["play", audiofile])
+        subprocess.call(["afplay", audiofile])
 
 
 
@@ -204,7 +204,7 @@ def next_audio():
 	
 def repeat():
 
-	subprocess.call(["play", audiofile])
+	subprocess.call(["afplay", audiofile])
 
 	global repeat_ct
 
