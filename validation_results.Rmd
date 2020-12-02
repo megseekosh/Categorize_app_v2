@@ -25,6 +25,7 @@ library('kableExtra')
 library('zoo')
 library('lme4')
 library('lmerTest')
+library('binom')
 ```
 
 ```{r, load in data, include=FALSE}
@@ -118,7 +119,7 @@ data_avbl <- data3 %>%
   group_by(id, method) %>%
   distinct(file_name, .keep_all = T) %>% # two, for random and complete
   mutate(voc = if_else(percents_voc > 0, "1", "0")) %>% # turn percents_voc binary
-  filter(sleeping=='1' | PID == '1' | researcher_present == '1' | voc == '0') %>%
+  filter(sleeping=='1' | researcher_present == '1' | voc == '0') %>%
   count() %>%
   rename(not_avl_clips = n) %>%
   merge(., data_annon, by=c('id', 'method')) %>%
@@ -454,46 +455,55 @@ cds_cors <- cds_plot_data %>%
   group_by(location) %>%
   summarize(., paste("r=",round(cor.test(complete, random)$estimate,2),",","p=",round(cor.test(complete, random)$p.value,2)))
 
-reg_tbl <- o3 %>%
-  group_by(method, location) %>%
-  summarize(avg=round(mean(percen_cds),2),
-            sd=round(sd(percen_cds),2)) %>%
-  mutate(stats=paste(avg,"(",sd,")")) %>%
-  select(-avg, -sd) %>%
-  spread(key='method', value = "stats") 
+#reg_tbl <- o3 %>%
+#  group_by(method, location) %>%
+#  summarize(avg=round(mean(percen_cds),2),
+#            sd=round(sd(percen_cds),2)) %>%
+#  mutate(stats=paste(avg,"(",sd,")")) %>%
+#  select(-avg, -sd) %>%
+#  spread(key='method', value = "stats") 
 
 # calculate relative errors
 cds_rel_error <- o3 %>%
-  group_by(method, location, id) %>%
-  summarize(avg=mean(percen_cds)) %>%
-  spread(key='method', value='avg') %>%
   group_by(id) %>%
-  mutate(relative_error = ((abs(random - complete) / complete)*100)) %>%
-  ungroup() %>%
-  group_by(location) %>%
-  mutate(avg_rel_error = round(mean(relative_error),2),
-         sd_rel_error = round(sd(relative_error),2),
-         rel_error_stats=paste(avg_rel_error,"(",sd_rel_error,")")) %>%
-  distinct(rel_error_stats)
+  #summarize(avg=mean(percen_cds)) %>%
+  select(id,method,percen_cds,location) %>%
+  spread(key='method', value='percen_cds') %>%
+  mutate(relative_error = round(((abs(random - complete) / complete)*100),2)) %>%
+  #mutate(avg_rel_error = round(mean(relative_error),2),
+  #       sd_rel_error = round(sd(relative_error),2),
+  #       rel_error_stats=paste(avg_rel_error,"(",sd_rel_error,")")) %>%
+  distinct(relative_error, .keep_all = T)
 
-# WILL DECIDE IF WE SHOULD ADD INDIVIDUAL OR GROUPED PRBs
+
+
 
 # add correlations to table - will make pretty below
-final_reg_tbl <- merge(reg_tbl, cds_cors, by='location')
+final_reg_tbl <- merge(cds_rel_error, cds_cors, by='location')
+
 final_reg_tbl$location <- 
   plyr::mapvalues(final_reg_tbl$location, 
                   from = c("Bolivia", "US"), 
                   to =c("Quechua-Spanish", "Spanish-English"))
 
-knitr::kable(final_reg_tbl, caption = 'Average child-directed speech estimates by corpus and annotation method.', 
+final_reg_tbl2 <- final_reg_tbl %>%
+  mutate(random = round(random,2),
+         complete = round(complete,2)) %>%
+  mutate(corpus_id = paste(location,"(",id,")")) %>%
+  select(-location, -id) %>%
+  relocate(corpus_id, random, complete)
+  
+
+
+knitr::kable(final_reg_tbl2, caption = 'Child-directed speech estimates by child and annotation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Corpus", "Random", "All-day", "Correlation between estimates")) %>% # "
+             col.names = c("Corpus (ID)", "Random", "All-day", "Relative error", "Within-corpus correlation between estimates")) %>% # "
   #column_spec(2, width = "4cm") %>% # force column headers onto two rows
   #column_spec(3, width = "3cm") %>%
-  #column_spec(4, width = "5cm") %>%
+  column_spec(5, width = "5cm") %>%
   kable_styling() %>%
-  add_header_above(c(" " = 1, "Annotation Method" = 2, " " = 1)) %>%
+  add_header_above(c(" " = 1, "Annotation Method" = 2, " " = 2)) %>%
   kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
@@ -698,45 +708,71 @@ random$id <- plyr::mapvalues(random$id,
 # only doing for CDS first - filter for other languages for language
 cds_var <- random %>% 
   group_by(id) %>%
-  mutate(total=n()) %>% # note that this is the total clips drawn, not just listened to
+  mutate(total=n()) %>% # total clips drawn & listened to
+  filter(researcher_present!='1' & sleeping!='1' & percents_voc>0) %>% # criteria for draw, but don't listen
+  distinct(file_name, .keep_all = T) %>%
+  mutate(annotation_num = as.numeric(1:n())) %>% # total clips annotated for lang/reg/childvoc/media, not just drawn
   select(-Otherchild2OtherChild, -Otherchild2adults, -Otherchild2unsure, -Adult2OtherChild, -Adult2Others, -Adult2unsure) %>%
   gather("addressee", "language", Adult2TargetChild, Otherchild2TargetChild) %>%
   distinct_at(., vars(file_name, timestamp_HHMMSS), .keep_all = T) %>% # CDS only gets counted 1x/clip; maintains clips drawn twice
-  select(-addressee) 
+  select(-addressee)
 
 
 cds_var$cds_cts <- plyr::mapvalues(cds_var$language, 
                 from=c("Categorize language to target child", "English/Quechua", "Mixed", "Spanish", "Unsure"), 
-                to=c("0", "1", "1", "1", "1"))
+                to=c("0", "1", "1", "1", "1")) # where 'cat lang...' are ADS or OCDS
 cds_var$cds_cts <- as.numeric(cds_var$cds_cts)
 cds_var$total <- as.numeric(cds_var$total)
 
 cds_rolling <- cds_var %>%
   group_by(id) %>%
-  mutate(cds_running_cts = as.numeric(cumsum(cds_cts)),
-         annotation_num = as.numeric(1:n())) %>%
+  mutate(cds_running_cts = as.numeric(cumsum(cds_cts))) %>%
   mutate(roll_prop_cds = cds_running_cts / annotation_num,
          roll_mean_cds = rollmean(roll_prop_cds, k=10, fill = NA),
          roll_sd_cds = rollapply(roll_prop_cds, width=10, FUN=sd, fill=NA))
+
+# running binomial confidence interval (wilson)
+cds_rolling2 <- cds_rolling %>%
+  group_by(id, annotation_num) %>% # group by id and sample size
+  summarize(cis = binom.confint(cds_running_cts, annotation_num, methods = 'wilson', conf.level = .95)) %>%
+  merge(., cds_rolling, by = c('id', 'annotation_num')) 
+
+# for models, compute binomial confidence interval in 5-clip batches
+#cds_batches <- cds_rolling %>%
+#  group_by(id) %>%
+#  mutate(five_clip_batch = as.integer(gl(n(), 5, n())) * 5,
+#         five_clip_batch = replace(five_clip_batch,  ave(five_clip_batch, five_clip_batch, FUN = length) < 5, NA)) %>% 
+#  ungroup %>% 
+#  fill(five_clip_batch) #%>%
+
+#cds_batches2 <- cds_batches %>%
+#  group_by(id, five_clip_batch) %>%
+#  summarize(five_cis = binom.confint(cds_running_cts, 5, methods = 'wilson', conf.level = .95)) %>%
+#  merge(., cds_batches, by = c('id', 'five_clip_batch'))
 ```
 
 ```{r, plot rolling CDS variances}
-cds_var_plot <- cds_rolling %>%
-filter(roll_sd_cds!='NA') %>% # remove rows where variance wasn't estimated
+cds_var_plot <- cds_rolling2 %>%
+#filter(roll_sd_cds!='NA') %>% # remove rows where variance wasn't estimated
+mutate(mean_ci = cis$mean,
+       upper_ci = cis$upper,
+       lower_ci = cis$lower) %>%  
 ggplot(., aes(annotation_num, roll_prop_cds)) +
   #geom_line(aes(y=rollapply(roll_prop_cds, 10, FUN=sd, fill=NA))) +
-  geom_line(aes(y=roll_sd_cds)) + 
-  xlab("# of clips drawn") + 
-  ylab("Variance in CDS estimation") + 
+  geom_ribbon(aes(ymax=upper_ci, ymin=lower_ci), fill='lightblue', color='deepskyblue4') +  
+    geom_line(aes(y=mean_ci), color='gray40', size=.8) + 
+  xlab("# of clips annotated") + 
+  ylab("CDS estimation and variance") + 
   facet_wrap(~id, scales = "free") +
-  #title = 'Variance in child-directed estimation as a function of clips drawn') +
- theme(title = element_text(size=18, face="bold"),
+  #title = 'Variance in child-directed estimation as a function of clips annotated') +
+ theme(title = element_text(size=12),
    axis.text=element_text(size=8),
       axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(size=15))
+      legend.title = element_text(size=15)) +
+  labs(caption = "Number of clips annotated refers to those annotated for language, speech register, child vocalizations, and/or media.")
 cds_var_plot
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/cds_var_plot.jpeg", height = 450, width = 700)
+jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/cds_CI_var_plot.jpeg", height = 450, width = 700)
 cds_var_plot
 dev.off()
 ```
@@ -745,45 +781,75 @@ dev.off()
 # now calculate rolling variances for US (Spanish)
 span_var <- random %>% 
   group_by(id) %>%
-  mutate(total=n()) %>% # note that this is the total clips drawn, not just listened to
+  mutate(total=n()) %>% # total clips drawn 
+  filter(researcher_present!='1' & sleeping!='1' & percents_voc>0) %>% # criteria for draw, but don't listen
+  distinct(file_name, .keep_all = T) %>%
+  mutate(annotation_num = as.numeric(1:n())) %>% # total clips annotated for lang/reg/childvoc/media, not just drawn
   gather("addressee", "language", Adult2TargetChild, Otherchild2TargetChild, Otherchild2OtherChild, Otherchild2adults,
          Otherchild2unsure, Adult2OtherChild, Adult2Others, Adult2unsure) %>%
-  filter(language=='Spanish' | language=='English/Quechua' | language=='Mixed') %>%
-  distinct_at(., vars(file_name, language), .keep_all = T) %>% # each language only gets counted 1x/clip; maintains clips drawn twice
+  distinct_at(., vars(file_name, timestamp_HHMMSS, language), .keep_all = T) %>% # each unique 'language' category only gets counted 1x/clip; maintains clips drawn twice
   select(-addressee)
 
 span_var$span_cts <- plyr::mapvalues(span_var$language, 
-                from=c("English/Quechua", "Mixed", "Spanish"), 
-                to=c("0", "0", "1"))
-span_var$span_cts <- as.numeric(span_var$span_cts)
-span_var$total <- as.numeric(span_var$total)
+                from=c("Categorize language to adults", "Categorize language to other adults", 
+                       "Categorize language to other child(ren)",
+                       "Categorize language to someone unknown",
+                       "Categorize language to target child",
+                       "Unsure",
+                       "None", "English/Quechua", "Mixed", "Spanish"), 
+                to=c("0","0","0","0","0","0","0","0", "0", "1")) 
 
-span_rolling <- span_var %>%
+span_var2 <- span_var %>%
+  distinct_at(., vars(file_name, span_cts), .keep_all = T) %>%
+  mutate(span_cts = as.numeric(span_cts),
+         total = as.numeric(total)) %>%
+  group_by(file_name, timestamp_HHMMSS) %>% 
+  add_count() %>%
+  filter(!(n==2 & span_cts==0)) %>% # when spanish and another category are marked, only count spanish 
+  group_by(file_name) %>%
+  distinct_at(., vars(annotation_num, language), .keep_all = T) %>% # remove 1 count of spanish (it gets counted 2x when multiple speakers used it)
+  select(-n)
+
+span_rolling <- span_var2 %>%
   filter(location=='US') %>%
-  group_by(id) %>%
-  mutate(span_running_cts = as.numeric(cumsum(span_cts)),
-         annotation_num = as.numeric(1:n())) %>%
+  group_by(id) %>% 
+  arrange(annotation_num) %>%
+  mutate(span_running_cts = as.numeric(cumsum(span_cts))) %>%
   mutate(roll_prop_span = span_running_cts / annotation_num,
          roll_mean_span = rollmean(roll_prop_span, k=10, fill = NA),
-         roll_sd_span = rollapply(roll_prop_span, width=10, FUN=sd, fill=NA))
+         roll_sd_span = rollapply(roll_prop_span, width=10, FUN=sd, fill=NA)) 
+
+# running binomial confidence interval (wilson)
+span_rolling2 <- span_rolling %>%
+  group_by(id, annotation_num) %>% # group by id and sample size
+  arrange(annotation_num) %>%
+  summarize(cis = binom.confint(span_running_cts, annotation_num, methods = 'wilson', conf.level = .95)) %>%
+  merge(., span_rolling, by = c('id', 'annotation_num')) 
+
+
 ```
 
 ```{r, plot rolling Spanish variances for US}
-span_var_plot <- span_rolling %>%
-filter(roll_sd_span!='NA') %>% # remove rows where variance wasn't estimated
+span_var_plot <- span_rolling2 %>%
+#filter(roll_sd_span!='NA') %>% # remove rows where variance wasn't estimated
+    mutate(mean_ci = cis$mean,
+         upper_ci = cis$upper,
+         lower_ci = cis$lower) %>%  
 ggplot(., aes(annotation_num, roll_prop_span)) +
-  geom_line(aes(y=roll_sd_span)) + 
-  xlab("# of clips drawn") + 
-  ylab("Variance in Spanish estimation") + 
+  geom_ribbon(aes(ymax=upper_ci, ymin=lower_ci), fill='lightblue', color='deepskyblue4') +
+  geom_line(aes(y=mean_ci), color='gray40', size=.8) + 
+  xlab("# of clips annotated") + 
+  ylab("Spanish language estimation \n and variance") + 
   facet_wrap(~id, scales = "free") +
   #title = 'Variance in Spanish language estimation as a function of clips drawn: US corpus') +
- theme(title = element_text(size=18, face="bold"),
+ theme(title = element_text(size=12),
    axis.text=element_text(size=8),
       axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(size=15))
+      legend.title = element_text(size=15))  +
+  labs(caption = "Number of clips annotated refers to those annotated for language, speech register, child vocalizations, and/or media.")
 span_var_plot
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/span_var_plot.jpeg", height = 450, width = 700)
+jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/span_CI_var_plot.jpeg", height = 450, width = 700)
 span_var_plot
 dev.off()
 ```
@@ -791,71 +857,160 @@ dev.off()
 ```{r, calculate rolling Quechua variances for Bolivia}
 que_var <- random %>% 
   group_by(id) %>%
-  mutate(total=n()) %>% # note that this is the total clips drawn, not just listened to
+  mutate(total=n()) %>% # total clips drawn 
+  filter(researcher_present!='1' & sleeping!='1' & percents_voc>0) %>% # criteria for draw, but don't listen
+  distinct(file_name, .keep_all = T) %>%
+  mutate(annotation_num = as.numeric(1:n())) %>% # total clips annotated for lang/reg/childvoc/media, not just drawn
   gather("addressee", "language", Adult2TargetChild, Otherchild2TargetChild, Otherchild2OtherChild, Otherchild2adults,
          Otherchild2unsure, Adult2OtherChild, Adult2Others, Adult2unsure) %>%
-  filter(language=='Spanish' | language=='English/Quechua' | language=='Mixed') %>%
-  distinct_at(., vars(file_name, language), .keep_all = T) %>% # each language only gets counted 1x/clip; maintains clips drawn twice
+  distinct_at(., vars(file_name, timestamp_HHMMSS, language), .keep_all = T) %>% # each unique 'language' category only gets counted 1x/clip
   select(-addressee)
 
 que_var$que_cts <- plyr::mapvalues(que_var$language, 
-                from=c("English/Quechua", "Mixed", "Spanish"), 
-                to=c("1", "0", "0"))
-que_var$que_cts <- as.numeric(que_var$que_cts)
-que_var$total <- as.numeric(que_var$total)
+                                     from=c("Categorize language to adults", "Categorize language to other adults", 
+                                            "Categorize language to other child(ren)",
+                                            "Categorize language to someone unknown",
+                                            "Categorize language to target child",
+                                            "Unsure",
+                                            "None", "English/Quechua", "Mixed", "Spanish"), 
+                                     to=c("0","0","0","0","0","0","0","1", "0", "0")) 
 
-que_rolling <- que_var %>%
+que_var2 <- que_var %>%
+  distinct_at(., vars(file_name, que_cts), .keep_all = T) %>%
+  mutate(que_cts = as.numeric(que_cts),
+         total = as.numeric(total)) %>%
+  group_by(file_name, timestamp_HHMMSS) %>% 
+  add_count() %>%
+  filter(!(n==2 & que_cts==0)) %>% # when quechua and another category are marked, only count quechua 
+  group_by(file_name) %>%
+  distinct_at(., vars(annotation_num, language), .keep_all = T) %>% # remove 1 count of quechua (it gets counted 2x when multiple speakers used it)
+  select(-n)
+
+que_rolling <- que_var2 %>%
   filter(location=='Bolivia') %>%
   group_by(id) %>%
-  mutate(que_running_cts = as.numeric(cumsum(que_cts)),
-         annotation_num = as.numeric(1:n())) %>%
+  arrange(annotation_num) %>%
+  mutate(que_running_cts = as.numeric(cumsum(que_cts))) %>%
   mutate(roll_prop_que = que_running_cts / annotation_num,
          roll_mean_que = rollmean(roll_prop_que, k=10, fill = NA),
          roll_sd_que = rollapply(roll_prop_que, width=10, FUN=sd, fill=NA))
+
+# running binomial confidence interval (wilson)
+que_rolling2 <- que_rolling %>%
+  group_by(id, annotation_num) %>% # group by id and sample size
+  arrange(annotation_num) %>%
+  summarize(cis = binom.confint(que_running_cts, annotation_num, methods = 'wilson', conf.level = .95)) %>%
+  merge(., que_rolling, by = c('id', 'annotation_num'))
 ```
 
 ```{r, plot rolling Quechua variances for Bolivia}
-que_var_plot <- que_rolling %>%
-filter(roll_sd_que!='NA') %>% # remove rows where variance wasn't estimated
+que_var_plot <- que_rolling2 %>%
+#filter(roll_sd_que!='NA') %>% # remove rows where variance wasn't estimated
+    mutate(mean_ci = cis$mean,
+         upper_ci = cis$upper,
+         lower_ci = cis$lower) %>%  
 ggplot(., aes(annotation_num, roll_prop_que)) +
-  geom_line(aes(y=roll_sd_que)) + 
-  xlab("# of clips drawn") + 
-  ylab("Variance in Quechua estimation") + 
+  geom_ribbon(aes(ymax=upper_ci, ymin=lower_ci), fill='lightblue', color='deepskyblue4') +
+  geom_line(aes(y=mean_ci), color='gray40', size=.8) + 
+  xlab("# of clips annotated") + 
+  ylab("Quechua language estimation \n and variance") + 
   facet_wrap(~id, scales = "free") +
   #title = 'Variance in Quechua language estimation as a function of clips drawn: Bolivia corpus') +
- theme(title = element_text(size=18, face="bold"),
+ theme(title = element_text(size=12),
    axis.text=element_text(size=8),
       axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(size=15))
+      legend.title = element_text(size=15)) +
+  labs(caption = "Number of clips annotated refers to those annotated for language, speech register, child vocalizations, and/or media.")
 que_var_plot
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/que_var_plot.jpeg", height = 450, width = 700)
+jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/que_CI_var_plot.jpeg", height = 450, width = 700)
 que_var_plot
 dev.off()
 ```
 
+```{r, report CI ranges}
+# report CI ranges at 80-clip mark and when annotation stopped, by child
+que_cis_table <- que_rolling2 %>%
+  group_by(id) %>%
+  filter(annotation_num==80 | annotation_num==NROW(id)) %>% # get values at 80-clip mark and cut-off
+  mutate(ci_range = cis$upper - cis$lower)
+
+lang_cis_table <- span_rolling2 %>%
+  group_by(id) %>%
+  filter(annotation_num==80 | annotation_num==NROW(id)) %>% # get values at 80-clip mark and cut-off
+  mutate(ci_range = cis$upper - cis$lower) %>%
+  rbind(., que_cis_table) %>%
+  select(id, annotation_num, ci_range) %>%
+  mutate(ci_range = round(ci_range,2)) %>%
+  mutate(timept = if_else(annotation_num==80, '80-clip_lang', 'Cut-off_lang')) %>%
+  select(-annotation_num) %>%
+  spread("timept", "ci_range")
+
+
+final_cis_table <- cds_rolling2 %>%
+  group_by(id) %>%
+  filter(annotation_num==80 | annotation_num==NROW(id)) %>% # get values at 80-clip mark and cut-off
+  mutate(ci_range = cis$upper - cis$lower) %>%
+  select(id, annotation_num, ci_range) %>%
+  mutate(ci_range = round(ci_range,2)) %>%
+  mutate(timept = if_else(annotation_num==80, '80-clip', 'Cut-off')) %>%
+  select(-annotation_num) %>%
+  spread("timept", "ci_range") %>%
+  merge(., lang_cis_table, by='id')
+
+knitr::kable(final_cis_table, caption = 'Confidence interval range for Spanish/Quechua and child-directed speech estimation, by child, after annotating 80 clips and at annotation cut-off.', 
+             booktabs=T, 
+             row.names = FALSE, 
+             col.names = c("Child ID", "80-clip", "Cut-off", "80-clip", "Cut-off")) %>% # "
+  kable_styling() %>%
+  add_header_above(c(" " = 1, "Language" = 2, "Child-directed speech" = 2)) %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
+
+```
+
 ```{r fit some quick models}
 # cds model 
-cds_model_data <- cds_rolling %>%
+cds_model_data <- cds_rolling2 %>%
   group_by(id) %>%
+  arrange(annotation_num) %>%
   mutate(halfrow = as.numeric(n()/2)) %>% # for a sanity check
-  filter(row_number() > n()*.90) # get the top 10% of rows from each group
-
+  filter(row_number() > n()*.50) # get the top 10% of rows from each group
   
 cds_model <- cds_model_data %>%
-  filter(roll_sd_cds!='NA') %>%
-  lmer(roll_sd_cds~annotation_num + (1|id), data = .) %>%
+  #filter(roll_sd_cds!='NA') %>%
+  filter(location=='US') %>%
+  mutate(ci_range = cis$upper - cis$lower) %>% 
+  lmer(ci_range~annotation_num + (1|id), data = .) %>%
   summary()
 
 # spanish model
-span_model_data <- span_rolling %>%
+# redo data to get the Bolivia corpus at the same time (more power for stats)
+span_rolling_all <- span_var2 %>%
+  group_by(id) %>% 
+  arrange(annotation_num) %>%
+  mutate(span_running_cts = as.numeric(cumsum(span_cts))) %>%
+  mutate(roll_prop_span = span_running_cts / annotation_num,
+         roll_mean_span = rollmean(roll_prop_span, k=10, fill = NA),
+         roll_sd_span = rollapply(roll_prop_span, width=10, FUN=sd, fill=NA)) 
+
+# running binomial confidence interval (wilson)
+span_rolling_all2 <- span_rolling_all %>%
+  group_by(id, annotation_num) %>% # group by id and sample size
+  arrange(annotation_num) %>%
+  summarize(cis = binom.confint(span_running_cts, annotation_num, methods = 'wilson', conf.level = .95)) %>%
+  merge(., span_rolling_all, by = c('id', 'annotation_num')) 
+
+# fit the spanish models
+span_model_data <- span_rolling_all2 %>%
   group_by(id) %>%
+  arrange(annotation_num) %>%
   mutate(halfrow = as.numeric(n()/2)) %>% # for a sanity check
-  filter(row_number() > n()*.90)
+  filter(row_number() > n()*.50)
 
 span_model <- span_model_data %>%
-  filter(roll_sd_span!='NA') %>%
-  lmer(roll_sd_span~annotation_num + (1|id), data = .) %>%
+  #filter(roll_sd_span!='NA') %>%
+  mutate(ci_range = cis$upper - cis$lower) %>% # get the variance
+  lmer(ci_range~annotation_num + (1|id), data = .) %>%
   summary()
 ```
 
