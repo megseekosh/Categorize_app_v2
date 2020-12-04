@@ -114,7 +114,7 @@
 
 \title{Validation results}
 \author{Meg Cychosz}
-\date{01 December 2020}
+\date{04 December 2020}
 
 \begin{document}
 \maketitle
@@ -173,7 +173,7 @@
 \StringTok{  }\KeywordTok{group_by}\NormalTok{(id, method) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{distinct}\NormalTok{(file_name, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# two, for random and complete}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{voc =} \KeywordTok{if_else}\NormalTok{(percents_voc }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{, }\StringTok{"1"}\NormalTok{, }\StringTok{"0"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# turn percents_voc binary}
-\StringTok{  }\KeywordTok{filter}\NormalTok{(sleeping}\OperatorTok{==}\StringTok{'1'} \OperatorTok{|}\StringTok{ }\NormalTok{PID }\OperatorTok{==}\StringTok{ '1'} \OperatorTok{|}\StringTok{ }\NormalTok{researcher_present }\OperatorTok{==}\StringTok{ '1'} \OperatorTok{|}\StringTok{ }\NormalTok{voc }\OperatorTok{==}\StringTok{ '0'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(sleeping}\OperatorTok{==}\StringTok{'1'} \OperatorTok{|}\StringTok{ }\NormalTok{researcher_present }\OperatorTok{==}\StringTok{ '1'} \OperatorTok{|}\StringTok{ }\NormalTok{voc }\OperatorTok{==}\StringTok{ '0'}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{count}\NormalTok{() }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{rename}\NormalTok{(}\DataTypeTok{not_avl_clips =}\NormalTok{ n) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{merge}\NormalTok{(., data_annon, }\DataTypeTok{by=}\KeywordTok{c}\NormalTok{(}\StringTok{'id'}\NormalTok{, }\StringTok{'method'}\NormalTok{)) }\OperatorTok{%>%}
@@ -276,17 +276,17 @@ Quechua-Spanish (1032) & 97 ( 5.05 \%) & 372 ( 19.38 \%)\\
 \cmidrule(l{3pt}r{3pt}){2-3} \cmidrule(l{3pt}r{3pt}){4-5}
 Corpus (ID) & Random & Complete & Random & Complete\\
 \midrule
-Spanish-English (267) & 345 ( 17.97 \%) & 960 ( 50 \%) & 101 ( 5.81 \%) & 274 ( 20.49 \%)\\
-Spanish-English (261) & 290 ( 15.1 \%) & 960 ( 50 \%) & 92 ( 5.06 \%) & 294 ( 19.32 \%)\\
-Spanish-English (199) & 192 ( 10 \%) & 960 ( 50 \%) & 118 ( 6.37 \%) & 467 ( 30.95 \%)\\
-Spanish-English (198) & 284 ( 14.79 \%) & 960 ( 50 \%) & 81 ( 4.52 \%) & 302 ( 20.54 \%)\\
-Spanish-English (179) & 192 ( 10 \%) & 960 ( 50 \%) & 120 ( 6.36 \%) & 633 ( 37.08 \%)\\
+Spanish-English (267) & 345 ( 17.97 \%) & 960 ( 50 \%) & 101 ( 5.8 \%) & 274 ( 20.4 \%)\\
+Spanish-English (261) & 290 ( 15.1 \%) & 960 ( 50 \%) & 92 ( 5.06 \%) & 294 ( 19.3 \%)\\
+Spanish-English (199) & 192 ( 10 \%) & 960 ( 50 \%) & 118 ( 6.36 \%) & 467 ( 30.83 \%)\\
+Spanish-English (198) & 284 ( 14.79 \%) & 960 ( 50 \%) & 81 ( 4.52 \%) & 302 ( 20.53 \%)\\
+Spanish-English (179) & 192 ( 10 \%) & 960 ( 50 \%) & 120 ( 6.36 \%) & 633 ( 37.04 \%)\\
 \addlinespace
-Quechua-Spanish (1081) & 249 ( 20.31 \%) & 613 ( 50 \%) & 92 ( 8.16 \%) & 285 ( 30.25 \%)\\
-Quechua-Spanish (1077) & 137 ( 11.93 \%) & 574 ( 50 \%) & 83 ( 7.33 \%) & 355 ( 32.84 \%)\\
-Quechua-Spanish (1075) & 267 ( 28.65 \%) & 466 ( 50 \%) & 81 ( 9.69 \%) & 199 ( 26.39 \%)\\
-Quechua-Spanish (1060) & 154 ( 14.58 \%) & 528 ( 50 \%) & 111 ( 10.66 \%) & 405 ( 40.91 \%)\\
-Quechua-Spanish (1032) & 263 ( 13.7 \%) & 960 ( 50 \%) & 97 ( 5.38 \%) & 372 ( 25.92 \%)\\
+Quechua-Spanish (1081) & 249 ( 20.31 \%) & 613 ( 50 \%) & 92 ( 8.16 \%) & 285 ( 30.19 \%)\\
+Quechua-Spanish (1077) & 137 ( 11.93 \%) & 574 ( 50 \%) & 83 ( 7.33 \%) & 355 ( 32.75 \%)\\
+Quechua-Spanish (1075) & 267 ( 28.65 \%) & 466 ( 50 \%) & 81 ( 9.68 \%) & 199 ( 26.36 \%)\\
+Quechua-Spanish (1060) & 154 ( 14.58 \%) & 528 ( 50 \%) & 111 ( 10.65 \%) & 405 ( 40.87 \%)\\
+Quechua-Spanish (1032) & 263 ( 13.7 \%) & 960 ( 50 \%) & 97 ( 5.38 \%) & 372 ( 25.89 \%)\\
 \bottomrule
 \end{tabular}
 
@@ -556,6 +556,46 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
 ##   2
 \end{verbatim}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# finally, we want to actuallly plot the proportions of each language category by child and annotation method}
+\NormalTok{lang_props <-}\StringTok{ }\NormalTok{plot_data }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{gather}\NormalTok{(}\StringTok{"language"}\NormalTok{, }\StringTok{"proportion"}\NormalTok{, percen_span, percen_que, percen_mxd) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id, proportion, language), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{method=}\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(method, }\StringTok{"complete"}\NormalTok{, }\StringTok{"all-day"}\NormalTok{),}
+         \DataTypeTok{id=}\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(id, }\KeywordTok{c}\NormalTok{(}\StringTok{"198-9mo"}\NormalTok{, }\StringTok{"261-8mo"}\NormalTok{, }\StringTok{"267-12mo"}\NormalTok{), }\KeywordTok{c}\NormalTok{(}\StringTok{"198"}\NormalTok{, }\StringTok{"261"}\NormalTok{, }\StringTok{"267"}\NormalTok{)),}
+         \DataTypeTok{language=}\KeywordTok{case_when}\NormalTok{(language}\OperatorTok{==}\StringTok{'percen_que'} \OperatorTok{&}\StringTok{ }\NormalTok{location}\OperatorTok{==}\StringTok{'Bolivia'} \OperatorTok{~}\StringTok{ " Quechua"}\NormalTok{, }
+\NormalTok{                         language}\OperatorTok{==}\StringTok{'percen_que'} \OperatorTok{&}\StringTok{ }\NormalTok{location}\OperatorTok{==}\StringTok{'US'} \OperatorTok{~}\StringTok{ ' English'}\NormalTok{,}
+                         \OtherTok{TRUE} \OperatorTok{~}\StringTok{ }\KeywordTok{as.character}\NormalTok{(language)),}
+         \DataTypeTok{language=}\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(language, }\KeywordTok{c}\NormalTok{(}\StringTok{"percen_mxd"}\NormalTok{, }\StringTok{"percen_span"}\NormalTok{), }\KeywordTok{c}\NormalTok{(}\StringTok{"Mixed"}\NormalTok{, }\StringTok{"Spanish"}\NormalTok{))) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(., }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{fill=}\NormalTok{language, }\DataTypeTok{y=}\NormalTok{proportion, }\DataTypeTok{x=}\NormalTok{method)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{position=}\StringTok{'stack'}\NormalTok{, }\DataTypeTok{stat=}\StringTok{'identity'}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{facet_grid}\NormalTok{(}\OperatorTok{~}\NormalTok{id) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{'annotation method'}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Proportion of language categories, by child and annotation method"}\NormalTok{,}
+       \DataTypeTok{subtitle =} \StringTok{"Quechua-Spanish corpus                                          Spanish-English corpus"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust =} \FloatTok{.9}\NormalTok{, }\DataTypeTok{vjust=}\NormalTok{.}\DecValTok{8}\NormalTok{),}
+        \DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{),}
+        \DataTypeTok{plot.subtitle =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{color=}\StringTok{'gray57'}\NormalTok{,}\DataTypeTok{hjust =} \FloatTok{.55}\NormalTok{))}
+\NormalTok{lang_props}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{validation_results_files/figure-latex/unnamed-chunk-1-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{jpeg}\NormalTok{(}\StringTok{"/Users/megcychosz/Google Drive/biling_CDS/results/figures/stacked_lang_plot.jpeg"}\NormalTok{, }\DataTypeTok{height =} \DecValTok{500}\NormalTok{, }\DataTypeTok{width =} \DecValTok{700}\NormalTok{)}
+\NormalTok{lang_props}
+\KeywordTok{dev.off}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
 \hypertarget{chid-directed-speech-across-random-and-full-methods}{%
 \subsubsection{Chid-directed speech across random and full methods}\label{chid-directed-speech-across-random-and-full-methods}}
 
@@ -570,8 +610,6 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
 \NormalTok{cds <-}\StringTok{ }\NormalTok{reg_annon }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{group_by}\NormalTok{(id, method) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{filter}\NormalTok{(addressee}\OperatorTok{==}\StringTok{'Adult2TargetChild'} \OperatorTok{|}\StringTok{ }\NormalTok{addressee}\OperatorTok{==}\StringTok{'Otherchild2TargetChild'}\NormalTok{) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{group_by}\NormalTok{(method) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{distinct}\NormalTok{(file_name, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{group_by}\NormalTok{(id, method) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{n_cds =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# # of CDS clips }
 \StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id, method), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
@@ -580,8 +618,6 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
 
 \NormalTok{ads <-}\StringTok{ }\NormalTok{reg_annon }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{filter}\NormalTok{(addressee}\OperatorTok{==}\StringTok{'Adult2Others'} \OperatorTok{|}\StringTok{ }\NormalTok{addressee}\OperatorTok{==}\StringTok{'Otherchild2adults'}\NormalTok{) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{group_by}\NormalTok{(method) }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{distinct}\NormalTok{(file_name, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{group_by}\NormalTok{(id, method) }\OperatorTok{%>%}\StringTok{  }
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{n_ads =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# # of ADS clips}
 \StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id, method), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
@@ -590,8 +626,6 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
 
 \NormalTok{o_child <-}\StringTok{ }\NormalTok{reg_annon }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{filter}\NormalTok{(addressee}\OperatorTok{==}\StringTok{'Adult2OtherChild'} \OperatorTok{|}\StringTok{ }\NormalTok{addressee}\OperatorTok{==}\StringTok{'Otherchild2OtherChild'}\NormalTok{) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{group_by}\NormalTok{(method) }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{distinct}\NormalTok{(file_name, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{group_by}\NormalTok{(id, method) }\OperatorTok{%>%}\StringTok{  }
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{n_ods =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# # of ODS clips}
 \StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id, method), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
@@ -688,16 +722,16 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
 \cmidrule(l{3pt}r{3pt}){2-3}
 Corpus (ID) & Random & All-day & Relative error & Within-corpus correlation between estimates\\
 \midrule
-Quechua-Spanish ( 1032 ) & 0.18 & 0.17 & 5.95 & r= 0.63 , p= 0.26\\
-Quechua-Spanish ( 1060 ) & 0.12 & 0.07 & 55.09 & r= 0.63 , p= 0.26\\
-Quechua-Spanish ( 1075 ) & 0.12 & 0.14 & 12.50 & r= 0.63 , p= 0.26\\
-Quechua-Spanish ( 1077 ) & 0.10 & 0.11 & 10.48 & r= 0.63 , p= 0.26\\
-Quechua-Spanish ( 1081 ) & 0.13 & 0.05 & 145.09 & r= 0.63 , p= 0.26\\
+Quechua-Spanish ( 1032 ) & 0.19 & 0.17 & 11.53 & r= 0.64 , p= 0.24\\
+Quechua-Spanish ( 1060 ) & 0.12 & 0.07 & 55.09 & r= 0.64 , p= 0.24\\
+Quechua-Spanish ( 1075 ) & 0.12 & 0.14 & 12.50 & r= 0.64 , p= 0.24\\
+Quechua-Spanish ( 1077 ) & 0.10 & 0.11 & 10.48 & r= 0.64 , p= 0.24\\
+Quechua-Spanish ( 1081 ) & 0.13 & 0.05 & 145.09 & r= 0.64 , p= 0.24\\
 \addlinespace
-Spanish-English ( 179 ) & 0.52 & 0.46 & 12.61 & r= 0.97 , p= 0.01\\
-Spanish-English ( 198-9mo ) & 0.65 & 0.66 & 0.54 & r= 0.97 , p= 0.01\\
-Spanish-English ( 199 ) & 0.28 & 0.30 & 6.24 & r= 0.97 , p= 0.01\\
-Spanish-English ( 261-8mo ) & 0.77 & 0.79 & 2.32 & r= 0.97 , p= 0.01\\
+Spanish-English ( 179 ) & 0.53 & 0.47 & 13.24 & r= 0.97 , p= 0.01\\
+Spanish-English ( 198-9mo ) & 0.65 & 0.66 & 1.09 & r= 0.97 , p= 0.01\\
+Spanish-English ( 199 ) & 0.29 & 0.31 & 6.06 & r= 0.97 , p= 0.01\\
+Spanish-English ( 261-8mo ) & 0.80 & 0.82 & 2.37 & r= 0.97 , p= 0.01\\
 Spanish-English ( 267-12mo ) & 0.40 & 0.47 & 15.23 & r= 0.97 , p= 0.01\\
 \bottomrule
 \end{tabular}
@@ -766,8 +800,8 @@ Spanish-English ( 267-12mo ) & 0.40 & 0.47 & 15.23 & r= 0.97 , p= 0.01\\
 \cmidrule(l{3pt}r{3pt}){2-3}
 Corpus & Random & All-day & Correlation between estimates & Average relative error (SD)\\
 \midrule
-Bolivia & 0.45 ( 0.13 ) & 0.4 ( 0.09 ) & r= 0.84 , p= 0.07 & 11.56 ( 12.11 )\\
-US & 0.27 ( 0.17 ) & 0.27 ( 0.2 ) & r= 0.96 , p= 0.01 & 16.75 ( 12.45 )\\
+Bolivia & 0.48 ( 0.14 ) & 0.42 ( 0.11 ) & r= 0.84 , p= 0.08 & 12.17 ( 12.56 )\\
+US & 0.27 ( 0.17 ) & 0.27 ( 0.2 ) & r= 0.95 , p= 0.01 & 17.57 ( 12.74 )\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -806,6 +840,43 @@ US & 0.27 ( 0.17 ) & 0.27 ( 0.2 ) & r= 0.96 , p= 0.01 & 16.75 ( 12.45 )\\
 \begin{Highlighting}[]
 \KeywordTok{jpeg}\NormalTok{(}\StringTok{"/Users/megcychosz/Google Drive/biling_CDS/results/figures/cds_plot.jpeg"}\NormalTok{, }\DataTypeTok{height =} \DecValTok{500}\NormalTok{, }\DataTypeTok{width =} \DecValTok{500}\NormalTok{)}
 \NormalTok{cds_plot}
+\KeywordTok{dev.off}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## pdf 
+##   2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# finally, we want to actuallly plot the proportions of each speech register category by child and annotation method}
+\NormalTok{reg_props <-}\StringTok{ }\NormalTok{o3 }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{gather}\NormalTok{(}\StringTok{"register"}\NormalTok{, }\StringTok{"proportion"}\NormalTok{, percen_cds, percen_ods, percen_ads) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id, proportion, register), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{method=}\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(method, }\StringTok{"complete"}\NormalTok{, }\StringTok{"all-day"}\NormalTok{),}
+         \DataTypeTok{id=}\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(id, }\KeywordTok{c}\NormalTok{(}\StringTok{"198-9mo"}\NormalTok{, }\StringTok{"261-8mo"}\NormalTok{, }\StringTok{"267-12mo"}\NormalTok{), }\KeywordTok{c}\NormalTok{(}\StringTok{"198"}\NormalTok{, }\StringTok{"261"}\NormalTok{, }\StringTok{"267"}\NormalTok{)),}
+         \DataTypeTok{register=}\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(register, }\KeywordTok{c}\NormalTok{(}\StringTok{"percen_cds"}\NormalTok{, }\StringTok{"percen_ods"}\NormalTok{, }\StringTok{"percen_ads"}\NormalTok{), }\KeywordTok{c}\NormalTok{(}\StringTok{"Child-directed speech"}\NormalTok{, }\StringTok{"Other-directed speech"}\NormalTok{, }\StringTok{"Adult-directed speech"}\NormalTok{))) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(., }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{fill=}\NormalTok{register, }\DataTypeTok{y=}\NormalTok{proportion, }\DataTypeTok{x=}\NormalTok{method)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{position=}\StringTok{'stack'}\NormalTok{, }\DataTypeTok{stat=}\StringTok{'identity'}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{facet_grid}\NormalTok{(}\OperatorTok{~}\NormalTok{id) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{'annotation method'}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Proportion of speech register categories, by child and annotation method"}\NormalTok{,}
+       \DataTypeTok{subtitle =} \StringTok{"Quechua-Spanish corpus                                       Spanish-English corpus"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust =} \FloatTok{.9}\NormalTok{, }\DataTypeTok{vjust=}\NormalTok{.}\DecValTok{8}\NormalTok{),}
+        \DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{),}
+        \DataTypeTok{plot.subtitle =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{color=}\StringTok{'gray57'}\NormalTok{,}\DataTypeTok{hjust =} \FloatTok{.55}\NormalTok{))}
+\NormalTok{reg_props}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{validation_results_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{jpeg}\NormalTok{(}\StringTok{"/Users/megcychosz/Google Drive/biling_CDS/results/figures/stacked_register_plot.jpeg"}\NormalTok{, }\DataTypeTok{height =} \DecValTok{500}\NormalTok{, }\DataTypeTok{width =} \DecValTok{700}\NormalTok{)}
+\NormalTok{reg_props}
 \KeywordTok{dev.off}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
@@ -885,8 +956,6 @@ Child ID & Random & All-day & Parental Questionnaire\\
 \StringTok{  }\KeywordTok{filter}\NormalTok{(addressee}\OperatorTok{==}\StringTok{'Adult2TargetChild'} \OperatorTok{|}\StringTok{ }\NormalTok{addressee}\OperatorTok{==}\StringTok{'Otherchild2TargetChild'} \OperatorTok{&}\StringTok{ }\NormalTok{location}\OperatorTok{==}\StringTok{'US'}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# only CDS clips}
 \StringTok{  }\KeywordTok{merge}\NormalTok{(., ques, }\DataTypeTok{by=}\StringTok{'id'}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{filter}\NormalTok{(language}\OperatorTok{==}\StringTok{'Spanish'}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# only Spanish clips}
-\StringTok{  }\KeywordTok{group_by}\NormalTok{(method) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{distinct}\NormalTok{(file_name, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{group_by}\NormalTok{(id, method) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{n_span_cds =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# # of CDS clips where Spanish was spoken}
 \StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id, method), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}

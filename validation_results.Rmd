@@ -390,6 +390,34 @@ dev.off()
 ```
 
 
+```{r}
+# finally, we want to actuallly plot the proportions of each language category by child and annotation method
+lang_props <- plot_data %>%
+  gather("language", "proportion", percen_span, percen_que, percen_mxd) %>%
+  distinct_at(., vars(id, proportion, language), .keep_all = T) %>%
+  mutate(method=plyr::mapvalues(method, "complete", "all-day"),
+         id=plyr::mapvalues(id, c("198-9mo", "261-8mo", "267-12mo"), c("198", "261", "267")),
+         language=case_when(language=='percen_que' & location=='Bolivia' ~ " Quechua", 
+                         language=='percen_que' & location=='US' ~ ' English',
+                         TRUE ~ as.character(language)),
+         language=plyr::mapvalues(language, c("percen_mxd", "percen_span"), c("Mixed", "Spanish"))) %>%
+  ggplot(., aes(fill=language, y=proportion, x=method)) +
+  geom_bar(position='stack', stat='identity') +
+  facet_grid(~id) +
+  xlab('annotation method') +
+  labs(title="Proportion of language categories, by child and annotation method",
+       subtitle = "Quechua-Spanish corpus                                          Spanish-English corpus") +
+  theme(axis.text.x = element_text(angle = 45, hjust = .9, vjust=.8),
+        plot.title = element_text(face="bold"),
+        plot.subtitle = element_text(color='gray57',hjust = .55))
+lang_props
+
+jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/stacked_lang_plot.jpeg", height = 500, width = 700)
+lang_props
+dev.off()
+```
+
+
 
 ### Chid-directed speech across random and full methods
 ```{r, register counts}
@@ -402,8 +430,6 @@ reg_annon <- data_annon %>%
 cds <- reg_annon %>% 
   group_by(id, method) %>%
   filter(addressee=='Adult2TargetChild' | addressee=='Otherchild2TargetChild') %>%
-  group_by(method) %>%
-  distinct(file_name, .keep_all = T) %>% 
   group_by(id, method) %>%
   mutate(n_cds = n()) %>% # # of CDS clips 
   distinct_at(., vars(id, method), .keep_all = T) %>%
@@ -412,8 +438,6 @@ cds <- reg_annon %>%
 
 ads <- reg_annon %>% 
   filter(addressee=='Adult2Others' | addressee=='Otherchild2adults') %>%
-  group_by(method) %>% 
-  distinct(file_name, .keep_all = T) %>% 
   group_by(id, method) %>%  
   mutate(n_ads = n()) %>% # # of ADS clips
   distinct_at(., vars(id, method), .keep_all = T) %>%
@@ -422,8 +446,6 @@ ads <- reg_annon %>%
 
 o_child <- reg_annon %>% 
   filter(addressee=='Adult2OtherChild' | addressee=='Otherchild2OtherChild') %>%
-  group_by(method) %>% 
-  distinct(file_name, .keep_all = T) %>% 
   group_by(id, method) %>%  
   mutate(n_ods = n()) %>% # # of ODS clips
   distinct_at(., vars(id, method), .keep_all = T) %>%
@@ -588,6 +610,36 @@ cds_plot
 dev.off()
 ```
 
+```{r}
+# finally, we want to actuallly plot the proportions of each speech register category by child and annotation method
+reg_props <- o3 %>%
+  gather("register", "proportion", percen_cds, percen_ods, percen_ads) %>%
+  distinct_at(., vars(id, proportion, register), .keep_all = T) %>%
+  mutate(method=plyr::mapvalues(method, "complete", "all-day"),
+         id=plyr::mapvalues(id, c("198-9mo", "261-8mo", "267-12mo"), c("198", "261", "267")),
+         register=plyr::mapvalues(register, c("percen_cds", "percen_ods", "percen_ads"), c("Child-directed speech", "Other-directed speech", "Adult-directed speech"))) %>%
+  ggplot(., aes(fill=register, y=proportion, x=method)) +
+  geom_bar(position='stack', stat='identity') +
+  facet_grid(~id) +
+  xlab('annotation method') +
+  labs(title="Proportion of speech register categories, by child and annotation method",
+       subtitle = "Quechua-Spanish corpus                                       Spanish-English corpus") +
+  theme(axis.text.x = element_text(angle = 45, hjust = .9, vjust=.8),
+        plot.title = element_text(face="bold"),
+        plot.subtitle = element_text(color='gray57',hjust = .55))
+reg_props
+
+jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/stacked_register_plot.jpeg", height = 500, width = 700)
+reg_props
+dev.off()
+```
+
+
+
+
+
+
+
 ### Part III: language across random and questionnaire methods
 ```{r make table for questionnaire method}
 # enter questionnaire estimates
@@ -636,8 +688,6 @@ span_cds_tbl <- reg_annon %>%
   filter(addressee=='Adult2TargetChild' | addressee=='Otherchild2TargetChild' & location=='US') %>% # only CDS clips
   merge(., ques, by='id') %>%
   filter(language=='Spanish') %>% # only Spanish clips
-  group_by(method) %>%
-  distinct(file_name, .keep_all = T) %>% 
   group_by(id, method) %>%
   mutate(n_span_cds = n()) %>% # # of CDS clips where Spanish was spoken
   distinct_at(., vars(id, method), .keep_all = T) %>%
