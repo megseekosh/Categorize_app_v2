@@ -216,6 +216,73 @@ mixed <- lang_annon %>%
   mutate(percen_mxd = n_mxd / total_lang_annotations) # compute mixed ratio
 ```
 
+```{r, language simulations}
+# now simulate 100 minority lang estimates from each child
+# take however many clips were used to compute the randomly-sampled estimate
+# then compute the prop. of those that are spanish/quechua
+# repeat 100X
+
+# total_reg_annotations refers to the # of clips used to estimate language prop 
+# get that variable
+random_lang_clips <- lang_annon %>%
+  filter(method=='random') %>%
+  distinct_at(., vars(id), .keep_all = T) %>%
+  ungroup() %>%
+  select(id, total_lang_annotations)
+
+sim_lang_data <- lang_annon %>%
+  filter(method=='complete') %>% # we're only sampling from all-day annotations
+  select(-total_lang_annotations) %>% # this is the # of all-day clips annotated and we want # of random clips
+  merge(., random_lang_clips, by='id') %>%
+  group_by(id) %>%
+  replicate(100, ., simplify = FALSE) %>% # simulate 100 collections of random clips
+  map_dfr(~ sample_n(., total_lang_annotations), .id = "simulation") # sample the same # of clips per simulation that were annotated for random sampling
+  
+# now compute the Quechua estimate for the Bolivia corpus
+que_sim_results <- sim_lang_data %>% 
+  filter(language=='English/Quechua' & location=='Bolivia') %>%
+  group_by(id, simulation) %>%
+  distinct(file_name, .keep_all = T) %>%
+  mutate(n_que=n()) %>%
+  distinct(id, .keep_all = T) %>%
+  mutate(percen_que = n_que / total_lang_annotations) # compute que/to all else
+
+# and the Spanish estimate for the US corpus
+span_sim_results <- sim_lang_data %>% 
+  filter(language=='Spanish' & location=='US') %>%
+  group_by(id, simulation) %>%
+  distinct(file_name, .keep_all = T) %>%
+  mutate(n_span=n()) %>%
+  distinct(id, .keep_all = T) %>%
+  mutate(percen_span = n_span / total_lang_annotations) # compute span/to all else
+
+# now some descriptive stats from those results
+# by corpus
+que_sim_stats <- que_sim_results %>%
+  ungroup() %>%
+  summarize(mean_sim_que = round(mean(percen_que),2),
+         sd_sim_que = round(sd(percen_que),2)) %>%
+  mutate(sim_stat = paste(mean_sim_que,"(",sd_sim_que,")")) %>%
+  select(sim_stat)
+
+span_sim_stats <- span_sim_results %>%
+  ungroup() %>%
+  summarize(mean_sim_span = round(mean(percen_span),2),
+         sd_sim_span = round(sd(percen_span),2)) %>%
+  mutate(sim_stat = paste(mean_sim_span,"(",sd_sim_span,")")) %>%
+  select(sim_stat)
+
+# now the spanish estimate by individual child in US corpus
+span_sim_child_stats <- span_sim_results %>%
+  group_by(id) %>%
+  summarize(mean_sim_span = round(mean(percen_span),2),
+         sd_sim_span = round(sd(percen_span),2)) %>%
+  mutate(sim_stat_child = paste(mean_sim_span,"(",sd_sim_span,")")) %>%
+  select(id, sim_stat_child)
+
+
+```
+
 ```{r, compute ratios/percens}
 vars <- data_annon_cts %>% 
   select(percen_ofallclips_drawn, id, method) %>%
@@ -296,26 +363,31 @@ bo_rel_error <- plot_data %>%
   distinct(rel_error_stats)
 
 # add correlations to table - will make pretty below
-us_lang_tbl <- cbind(us_lang_tbl, us_cor) %>%
+us_lang_tbl2 <- cbind(us_lang_tbl, us_cor) %>%
   cbind(., us_rel_error) %>%
+  cbind(., span_sim_stats) %>%
   mutate(Corpus = "Spanish-English (Spanish)") %>%
-  relocate(c(Corpus, random, complete))
+  relocate(c(Corpus, random, complete, rel_error_stats, sim_stat))
 
-bo_lang_tbl <- cbind(bo_lang_tbl, bo_cor) %>%
+bo_lang_tbl2 <- cbind(bo_lang_tbl, bo_cor) %>%
   cbind(., bo_rel_error) %>%
+  cbind(., que_sim_stats) %>%
   mutate(Corpus = "Quechua-Spanish (Quechua)") %>%
-  relocate(c(Corpus, random, complete)) 
+  relocate(c(Corpus, random, complete, rel_error_stats, sim_stat)) 
 
-lang_tbl <- rbind(us_lang_tbl, bo_lang_tbl)
+lang_tbl <- rbind(us_lang_tbl2, bo_lang_tbl2)
 ```
 
 ```{r, generate lang tables}
-knitr::kable(lang_tbl, caption = 'Minority language estimates by corpus and annotation method.', 
+knitr::kable(lang_tbl, caption = 'Average minority language estimates by corpus and annotation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Corpus (language)", "Random", "All-day", "Correlation between estimates", "Average relative error (SD)")) %>% 
+             col.names = c("Corpus (language)", "Random", "All-day", "Avg. relative error (SD)", "n=100 simulations of random sampling", "Correlation between estimates")) %>% 
+  column_spec(1, width = "4cm") %>%
+    column_spec(4, width = "3cm") %>%
+  column_spec(5:6, width = "4cm") %>%
   kable_styling() %>%
-  add_header_above(c(" " = 1, "Annotation Method" = 2, " " = 2)) %>%
+  add_header_above(c(" " = 1, "Annotation Method" = 2, " " = 3)) %>%
   kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
@@ -405,11 +477,16 @@ lang_props <- plot_data %>%
   geom_bar(position='stack', stat='identity') +
   facet_grid(~id) +
   xlab('annotation method') +
-  labs(title="Proportion of language categories, by child and annotation method",
-       subtitle = "Quechua-Spanish corpus                                          Spanish-English corpus") +
-  theme(axis.text.x = element_text(angle = 45, hjust = .9, vjust=.8),
+    labs(subtitle = "Quechua-Spanish corpus                       Spanish-English corpus") +
+  #labs(title="Proportion of language categories, by child and annotation method",
+   #    subtitle = "Quechua-Spanish corpus                                          Spanish-English corpus") +
+  theme(axis.text.x = element_text(angle = 45, hjust = .9, vjust=.8, size=11),
         plot.title = element_text(face="bold"),
-        plot.subtitle = element_text(color='gray57',hjust = .55))
+        plot.subtitle = element_text(color='gray50',hjust = .55, face='bold', size=14),
+        axis.title=element_text(size=17,face="bold"),
+        legend.title = element_text(size=15,face = "bold"),
+        legend.text = element_text(size=13),
+        strip.text.x = element_text(size=9, face="bold"))
 lang_props
 
 jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/stacked_lang_plot.jpeg", height = 500, width = 700)
@@ -419,7 +496,7 @@ dev.off()
 
 
 
-### Chid-directed speech across random and full methods
+### Child-directed speech across random and full methods
 ```{r, register counts}
 reg_annon <- data_annon %>%
   filter(addressee=='Adult2TargetChild' | addressee=='Otherchild2TargetChild' | addressee=='Adult2Others' | addressee=='Otherchild2adults' | addressee=='Adult2OtherChild' | addressee=='Otherchild2OtherChild') %>% # only clips where we know the register
@@ -460,6 +537,61 @@ o3[is.na(o3)] <- 0 # one child doesn't have any ODS
 o3$total <- o3$percen_ods + o3$percen_ads + o3$percen_cds
 ```
 
+```{r, CDS simulations}
+# now simulate 100 CDS estimates from each child
+# take however many clips were used to compute the randomly-sampled estimate
+# then compute the prop. of those that are CDS
+# repeat 100X
+
+# total_reg_annotations refers to the # of clips used to estimate speech register 
+# get that variable
+random_clips <- reg_annon %>%
+  filter(method=='random') %>%
+  distinct_at(., vars(id), .keep_all = T) %>%
+  ungroup() %>%
+  select(id, total_reg_annotations)
+
+sim_data <- reg_annon %>%
+  filter(method=='complete') %>% # we're only sampling from all-day annotations
+  select(-total_reg_annotations) %>% # this is the # of all-day clips annotated and we want # of random clips
+  merge(., random_clips, by='id') %>%
+  group_by(id) %>%
+  replicate(100, ., simplify = FALSE) %>% # simulate 100 collections of random clips
+  map_dfr(~ sample_n(., total_reg_annotations), .id = "simulation") # sample the same # of clips per simulation that were annotated for random sampling
+  
+# now compute the CDS estimate
+cds_sim_results <- sim_data %>% 
+  group_by(id, simulation) %>%
+  filter(addressee=='Adult2TargetChild' | addressee=='Otherchild2TargetChild') %>%
+  mutate(n_cds = n()) %>% # # of CDS clips 
+  distinct(id, .keep_all = T) %>%
+  mutate(percen_cds = n_cds / total_reg_annotations)
+
+# now some descriptive stats from those results
+cds_sim_stats <- cds_sim_results %>%
+  group_by(id) %>%
+  summarize(mean_sim_cds = round(mean(percen_cds),2),
+         sd_sim_cds = round(sd(percen_cds),2)) %>%
+  mutate(sim_stat = paste(mean_sim_cds,"(",sd_sim_cds,")")) %>%
+  select(id, sim_stat)
+
+# now compute the ADS estimate
+ads_sim_results <- sim_data %>% 
+  group_by(id, simulation) %>%
+  filter(addressee=='Adult2Others' | addressee=='Otherchild2adults') %>%
+  mutate(n_ads = n()) %>% # # of CDS clips 
+  distinct(id, .keep_all = T) %>%
+  mutate(percen_ads = n_ads / total_reg_annotations)
+
+# now some descriptive stats from those results
+ads_sim_stats <- ads_sim_results %>%
+  group_by(location) %>%
+  summarize(mean_sim_ads = round(mean(percen_ads),2),
+         sd_sim_ads = round(sd(percen_ads),2)) %>%
+  mutate(sim_stat_ads = paste(mean_sim_ads,"(",sd_sim_ads,")")) %>%
+  select(location, sim_stat_ads)
+```
+
 ```{r, cds proportion stats}
 # for later
 percen_cds_df <- o3 %>%
@@ -470,11 +602,15 @@ percen_cds_df <- o3 %>%
 cds_plot_data <- o3 %>%
   select(id, gender, location, num_clips, method, percen_cds) %>%
   spread("method", "percen_cds") %>%
-  merge(., percen_cds_df, by='id')
+  merge(., percen_cds_df, by='id') 
 
 # compute correlations
 cds_cors <- cds_plot_data %>%
   group_by(location) %>%
+  summarize(., paste("r=",round(cor.test(complete, random)$estimate,2),",","p=",round(cor.test(complete, random)$p.value,2)))
+
+# also do a correlation for both corpora
+cds_cors_all <- cds_plot_data %>%
   summarize(., paste("r=",round(cor.test(complete, random)$estimate,2),",","p=",round(cor.test(complete, random)$p.value,2)))
 
 #reg_tbl <- o3 %>%
@@ -500,8 +636,10 @@ cds_rel_error <- o3 %>%
 
 
 
-# add correlations to table - will make pretty below
-final_reg_tbl <- merge(cds_rel_error, cds_cors, by='location')
+# add correlations and simulated stats to table - will make pretty below
+final_reg_tbl <- cds_rel_error %>%
+  merge(., cds_cors, by='location') %>%
+  merge(., cds_sim_stats, by='id')
 
 final_reg_tbl$location <- 
   plyr::mapvalues(final_reg_tbl$location, 
@@ -513,19 +651,19 @@ final_reg_tbl2 <- final_reg_tbl %>%
          complete = round(complete,2)) %>%
   mutate(corpus_id = paste(location,"(",id,")")) %>%
   select(-location, -id) %>%
-  relocate(corpus_id, random, complete)
+  relocate(corpus_id, random, complete, relative_error, sim_stat)
   
 
 
-knitr::kable(final_reg_tbl2, caption = 'Child-directed speech estimates by child and annotation method.', 
+knitr::kable(final_reg_tbl2, caption = 'Target child-directed speech estimates by child and annotation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Corpus (ID)", "Random", "All-day", "Relative error", "Within-corpus correlation between estimates")) %>% # "
-  #column_spec(2, width = "4cm") %>% # force column headers onto two rows
-  #column_spec(3, width = "3cm") %>%
-  column_spec(5, width = "5cm") %>%
+             col.names = c("Corpus (ID)", "Random", "All-day", "Relative error", "n=100 simulations of random sampling", "Within-corpus correlation between random and all-day estimates")) %>% # "
+  column_spec(1, width = "4cm") %>% # force column headers onto two rows
+  column_spec(4, width = "3cm") %>%
+  column_spec(5:6, width = "4cm") %>%
   kable_styling() %>%
-  add_header_above(c(" " = 1, "Annotation Method" = 2, " " = 2)) %>%
+  add_header_above(c(" " = 1, "Annotation Method" = 2, " " = 3)) %>%
   kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
@@ -564,19 +702,26 @@ ads_rel_error <- o3 %>%
   distinct(rel_error_stats)
 
 # add correlations to table - will make pretty below
-final_reg_tbl <- merge(reg_tbl, ads_cors, by='location')
-final_reg_tbl2 <- merge(final_reg_tbl, ads_rel_error, by='location')
+final_reg_tbl <- reg_tbl %>%
+  merge(., ads_cors, by='location') %>%
+  merge(., ads_rel_error, by='location') %>%
+  merge(., ads_sim_stats, by='location') %>%
+  relocate(location, random, complete, rel_error_stats, sim_stat_ads)
+
 final_reg_tbl$location <- 
   plyr::mapvalues(final_reg_tbl$location, 
                   from = c("Bolivia", "US"), 
                   to =c("Quechua-Spanish", "Spanish-English"))
 
-knitr::kable(final_reg_tbl2, caption = 'Average adult-directed speech estimates by corpus and annotation method.', 
+knitr::kable(final_reg_tbl, caption = 'Average adult-directed speech estimates by corpus and annotation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Corpus", "Random", "All-day", "Correlation between estimates", "Average relative error (SD)")) %>% 
+             col.names = c("Corpus", "Random", "All-day", "Average relative error (SD)", "n=100 simulations of random sampling",  "Correlation between estimates")) %>% 
+  column_spec(1, width = "3.5cm") %>%
+  column_spec(4, width = "3cm") %>%
+  column_spec(5:6, width = "4cm") %>%
   kable_styling() %>%
-  add_header_above(c(" " = 1, "Annotation Method" = 2, " " = 2)) %>%
+  add_header_above(c(" " = 1, "Annotation Method" = 2, " " = 3)) %>%
   kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
@@ -617,16 +762,21 @@ reg_props <- o3 %>%
   distinct_at(., vars(id, proportion, register), .keep_all = T) %>%
   mutate(method=plyr::mapvalues(method, "complete", "all-day"),
          id=plyr::mapvalues(id, c("198-9mo", "261-8mo", "267-12mo"), c("198", "261", "267")),
-         register=plyr::mapvalues(register, c("percen_cds", "percen_ods", "percen_ads"), c("Child-directed speech", "Other-directed speech", "Adult-directed speech"))) %>%
+         register=plyr::mapvalues(register, c("percen_cds", "percen_ods", "percen_ads"), c("Target child-directed \n speech", "Other child-directed \n speech", "Adult-directed \n speech"))) %>%
   ggplot(., aes(fill=register, y=proportion, x=method)) +
   geom_bar(position='stack', stat='identity') +
   facet_grid(~id) +
   xlab('annotation method') +
-  labs(title="Proportion of speech register categories, by child and annotation method",
-       subtitle = "Quechua-Spanish corpus                                       Spanish-English corpus") +
-  theme(axis.text.x = element_text(angle = 45, hjust = .9, vjust=.8),
+   labs(subtitle = "Quechua-Spanish corpus                   Spanish-English corpus") +
+  #labs(title="Proportion of speech register categories, by child and annotation method",
+       #subtitle = "Quechua-Spanish corpus                                       Spanish-English corpus") +
+  theme(axis.text.x = element_text(angle = 45, hjust = .9, vjust=.8, size=11),
         plot.title = element_text(face="bold"),
-        plot.subtitle = element_text(color='gray57',hjust = .55))
+        plot.subtitle = element_text(color='gray50',hjust = .55, face='bold', size=14),
+        axis.title=element_text(size=17,face="bold"),
+        legend.title = element_text(size=15,face = "bold"),
+        legend.text = element_text(size=13),
+        strip.text.x = element_text(size=9, face="bold"))
 reg_props
 
 jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/stacked_register_plot.jpeg", height = 500, width = 700)
@@ -653,7 +803,8 @@ ques_tbl <- plot_data %>%
   select(-percen_ofallclips_drawn, -percen_mxd, -percen_que, -speech_clips, -total, -gender, -location, -num_clips) %>%
   mutate(percen_span = round(percen_span,2)) %>%
   spread("method", "percen_span") %>%
-  relocate(id, random, complete, ques_est)
+  merge(., span_sim_child_stats, by='id') %>%
+  relocate(id, random, complete, sim_stat_child)
 
 # compute correlations
 ques_random_cors <- ques_tbl %>%
@@ -667,15 +818,14 @@ ques_complete_cors <- ques_tbl %>%
 knitr::kable(ques_tbl, caption = 'Spanish language estimates in U.S. corpus, by child and estimation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Child ID", "Random", "All-day", "Parental Questionnaire")) %>% 
+             col.names = c("Child ID", "Random", "All-day", "n=100 simulations of random sampling", "Parental Questionnaire")) %>% 
+  column_spec(4:5, width = "4cm") %>%
   kable_styling() %>%
-  add_header_above(c(" " = 1, "From daylong recording" = 2, " " = 1)) %>%
+  add_header_above(c(" " = 1, "From daylong recording" = 3, " " = 1)) %>%
   kableExtra::kable_styling(latex_options = "hold_position")
+```
 
-
-
-
-
+```{r, cds-by-span}
 # we also want to know what the results are for the combination of CDS*Spanish, not just Spanish
 reg_annon <- data_annon %>%
   filter(addressee=='Adult2TargetChild' | addressee=='Otherchild2TargetChild') %>% # only CDS clips
@@ -694,19 +844,60 @@ span_cds_tbl <- reg_annon %>%
   mutate(percen_span_cds = round(n_span_cds / total_cds_annotations,2)) %>%
   select(method, percen_span_cds, id, ques_est) %>%
   spread("method", "percen_span_cds") %>%
-  relocate(id, random, complete, ques_est) 
+  relocate(id, random, complete) 
 
 # compute correlations
 cor.test(as.numeric(span_cds_tbl$ques_est), span_cds_tbl$complete)
 cor.test(as.numeric(span_cds_tbl$ques_est), span_cds_tbl$random)
 
+# simulate 100 estimates from random samples
+# total_cds_annotations refers to the # of clips used to estimate CDS*spanish  
+# what prop. of totalCDS are spoken in Spanish?
+random_cds_clips <- reg_annon %>%
+  filter(method=='random' & location=='US') %>%
+  distinct_at(., vars(id), .keep_all = T) %>%
+  ungroup() %>%
+  select(id, total_cds_annotations)
+
+cdsspan_sim_data <- reg_annon %>%
+  filter(method=='complete' & location=='US') %>% # we're only sampling from all-day annotations
+  select(-total_cds_annotations) %>% # this is the # of all-day clips annotated and we want # of random clips
+  merge(., random_cds_clips, by='id') %>%
+  group_by(id) %>%
+  replicate(100, ., simplify = FALSE) %>% # simulate 100 collections of random clips
+  map_dfr(~ sample_n(., total_cds_annotations), .id = "simulation") # sample the same # of clips per simulation that were annotated for random sampling
+
+# now compute the CDS*spanish estimate
+cdsspan_sim_results <- cdsspan_sim_data %>% 
+  group_by(id, simulation) %>%
+  filter(language=='Spanish') %>%
+  mutate(n_cdsspan = n()) %>% # # of spanish clips amongst these CDS clips
+  distinct(id, .keep_all = T) %>%
+  mutate(percen_cdsspan = n_cdsspan / total_cds_annotations)
+
+# now some descriptive stats from those results
+cdsspan_sim_stats <- cdsspan_sim_results %>%
+  group_by(id) %>%
+  summarize(mean_sim_cdsspan = round(mean(percen_cdsspan),2),
+            sd_sim_cdsspan = round(sd(percen_cdsspan),2)) %>%
+  mutate(sim_stat_cdsspan = paste(mean_sim_cdsspan,"(",sd_sim_cdsspan,")")) %>%
+  select(id, sim_stat_cdsspan)
+
+# now combine the simulated data with the span*cds table
+span_cds_tbl2 <- span_cds_tbl %>% 
+  merge(., cdsspan_sim_stats, by='id') %>%
+  relocate(id, random, complete, sim_stat_cdsspan)
+
+
 # create table
-knitr::kable(span_cds_tbl, caption = 'Spanish language in child-directed speech \n estimates in U.S. corpus, by child and estimation method.', 
+knitr::kable(span_cds_tbl2, caption = 'Spanish language in child-directed speech \n estimates in U.S. corpus, by child and estimation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Child ID", "Random", "All-day", "Parental Questionnaire")) %>% 
+             col.names = c("Child ID", "Random", "All-day", "n=100 simulations of random sampling", "Parental Questionnaire")) %>% 
+  column_spec(1:3, width = "2cm") %>%
+  column_spec(4:5, width = "4cm") %>%
   kable_styling() %>%
-  add_header_above(c(" " = 1, "From daylong recording" = 2, " " = 1)) %>%
+  add_header_above(c(" " = 1, "From daylong recording" = 3, " " = 1)) %>%
   kableExtra::kable_styling(latex_options = "hold_position")
 ```
 

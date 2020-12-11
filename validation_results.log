@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  28 NOV 2020 16:19
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  11 DEC 2020 13:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -660,147 +660,198 @@ Overfull \hbox (7.38293pt too wide) in paragraph at lines 273--292
  [][] 
  []
 
-[3] [4]
-Underfull \vbox (badness 10000) detected at line 433
+[3]
+Underfull \vbox (badness 1831) detected at line 403
  []
 
-
-Underfull \vbox (badness 10000) detected at line 433
+[4]
+Underfull \vbox (badness 1527) detected at line 426
  []
 
 [5]
-Overfull \hbox (71.57988pt too wide) in paragraph at lines 451--461
+Underfull \vbox (badness 1831) detected at line 502
+ []
+
+[6]
+Overfull \hbox (135.70332pt too wide) in paragraph at lines 523--533
  [][] 
  []
 
-[6pdfTeX warning (ext4): destination with the same identifier (name{table.1}) h
+[7pdfTeX warning (ext4): destination with the same identifier (name{table.1}) h
 as been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.496 \end{Shaded}
-                  ]
-<validation_results_files/figure-latex/us plot-1.pdf, id=41, 452.69125pt x 315.
+l.535 \begin{Shaded}
+                    ]
+<validation_results_files/figure-latex/us plot-1.pdf, id=46, 452.69125pt x 315.
 1775pt>
 File: validation_results_files/figure-latex/us plot-1.pdf Graphic file (type pd
 f)
 <use validation_results_files/figure-latex/us plot-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/us plot-1.pdf  u
-sed on input line 498.
+sed on input line 570.
 (pdftex.def)             Requested size: 452.69014pt x 315.17673pt.
-[7 <./validation_results_files/figure-latex/us plot-1.pdf>]
-<validation_results_files/figure-latex/bolivia plot-1.pdf, id=61, 452.69125pt x
+[8] [9 <./validation_results_files/figure-latex/us plot-1.pdf>]
+<validation_results_files/figure-latex/bolivia plot-1.pdf, id=69, 452.69125pt x
  319.1925pt>
 File: validation_results_files/figure-latex/bolivia plot-1.pdf Graphic file (ty
 pe pdf)
 <use validation_results_files/figure-latex/bolivia plot-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/bolivia plot-1.p
-df  used on input line 544.
+df  used on input line 616.
 (pdftex.def)             Requested size: 452.69014pt x 319.19171pt.
-[8 <./validation_results_files/figure-latex/bolivia plot-1.pdf>] [9]
+[10 <./validation_results_files/figure-latex/bolivia plot-1.pdf>]
+<validation_results_files/figure-latex/unnamed-chunk-1-1.pdf, id=88, 458.71375p
+t x 312.16624pt>
+File: validation_results_files/figure-latex/unnamed-chunk-1-1.pdf Graphic file 
+(type pdf)
+<use validation_results_files/figure-latex/unnamed-chunk-1-1.pdf>
+Package pdftex.def Info: validation_results_files/figure-latex/unnamed-chunk-1-
+1.pdf  used on input line 661.
+(pdftex.def)             Requested size: 458.71962pt x 312.17024pt.
+[11 <./validation_results_files/figure-latex/unnamed-chunk-1-1.pdf>]
+Underfull \vbox (badness 1931) detected at line 776
+ []
 
-LaTeX Warning: `!h' float specifier changed to `!ht'.
+[12]
+Underfull \vbox (badness 2469) detected at line 853
+ []
 
-[10]
-Underfull \vbox (badness 10000) detected at line 739
+[13]
+Underfull \vbox (badness 10000) detected at line 853
  []
 
 
-Underfull \vbox (badness 10000) detected at line 739
+Underfull \vbox (badness 10000) detected at line 853
  []
 
-[11pdfTeX warning (ext4): destination with the same identifier (name{table.2}) 
+[14]
+Overfull \hbox (103.98117pt too wide) in paragraph at lines 859--878
+ [][] 
+ []
+
+[15pdfTeX warning (ext4): destination with the same identifier (name{table.2}) 
 has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.739 \end{Shaded}
+l.938 \end{Shaded}
                   ]
-<validation_results_files/figure-latex/cds plot-1.pdf, id=95, 456.70625pt x 323
-.2075pt>
+Overfull \hbox (121.47694pt too wide) in paragraph at lines 944--954
+ [][] 
+ []
+
+[16pdfTeX warning (ext4): destination with the same identifier (name{table.3}) 
+has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.982 \end{Shaded}
+                  ]
+<validation_results_files/figure-latex/cds plot-1.pdf, id=126, 456.70625pt x 32
+3.2075pt>
 File: validation_results_files/figure-latex/cds plot-1.pdf Graphic file (type p
 df)
 <use validation_results_files/figure-latex/cds plot-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/cds plot-1.pdf  
-used on input line 785.
+used on input line 984.
 (pdftex.def)             Requested size: 456.71906pt x 323.21657pt.
-[12pdfTeX warning (ext4): destination with the same identifier (name{table.3}) 
-has been already used, duplicate ignored
+[17 <./validation_results_files/figure-latex/cds plot-1.pdf>]
+<validation_results_files/figure-latex/unnamed-chunk-2-1.pdf, id=145, 454.69875
+pt x 312.16624pt>
+File: validation_results_files/figure-latex/unnamed-chunk-2-1.pdf Graphic file 
+(type pdf)
+<use validation_results_files/figure-latex/unnamed-chunk-2-1.pdf>
+Package pdftex.def Info: validation_results_files/figure-latex/unnamed-chunk-2-
+1.pdf  used on input line 1026.
+(pdftex.def)             Requested size: 454.70456pt x 312.17024pt.
+[18 <./validation_results_files/figure-latex/unnamed-chunk-2-1.pdf>] [19pdfTeX 
+warning (ext4): destination with the same identifier (name{table.4}) has been a
+lready used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.787 \begin{Shaded}
-                    ] [13 <./validation_results_files/figure-latex/cds plot-1.p
-df>] [14pdfTeX warning (ext4): destination with the same identifier (name{table
-.4}) has been already used, duplicate ignored
+l.1124 \end{Shaded}
+                   ] [20]
+Overfull \hbox (73.9418pt too wide) in paragraph at lines 1219--1232
+ [][] 
+ []
 
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.897 \end{verbatim}
-                    ] [15pdfTeX warning (ext4): destination with the same ident
-ifier (name{table.5}) has been already used, duplicate ignored
 
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.986 \end{Shaded}
-                  ]
-<validation_results_files/figure-latex/questionnaire plot-1.pdf, id=132, 452.69
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[21]
+<validation_results_files/figure-latex/questionnaire plot-1.pdf, id=175, 452.69
 125pt x 315.1775pt>
 File: validation_results_files/figure-latex/questionnaire plot-1.pdf Graphic fi
 le (type pdf)
 <use validation_results_files/figure-latex/questionnaire plot-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/questionnaire pl
-ot-1.pdf  used on input line 988.
+ot-1.pdf  used on input line 1270.
 (pdftex.def)             Requested size: 452.69014pt x 315.17673pt.
-[16 <./validation_results_files/figure-latex/questionnaire plot-1.pdf>]
-<validation_results_files/figure-latex/plot rolling CDS variances-1.pdf, id=151
-, 461.725pt x 315.1775pt>
+[22pdfTeX warning (ext4): destination with the same identifier (name{table.5}) 
+has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.1272 \begin{Shaded}
+                     ] [23 <./validation_results_files/figure-latex/questionnai
+re plot-1.pdf>]
+<validation_results_files/figure-latex/plot rolling CDS variances-1.pdf, id=200
+, 469.755pt x 316.18124pt>
 File: validation_results_files/figure-latex/plot rolling CDS variances-1.pdf Gr
 aphic file (type pdf)
 <use validation_results_files/figure-latex/plot rolling CDS variances-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/plot rolling CDS
- variances-1.pdf  used on input line 1057.
-(pdftex.def)             Requested size: 461.72388pt x 315.17673pt.
-[17] [18 <./validation_results_files/figure-latex/plot rolling CDS variances-1.
+ variances-1.pdf  used on input line 1365.
+(pdftex.def)             Requested size: 469.75386pt x 316.18047pt.
+[24] [25 <./validation_results_files/figure-latex/plot rolling CDS variances-1.
 pdf>]
 <validation_results_files/figure-latex/plot rolling Spanish variances for US-1.
-pdf, id=170, 459.7175pt x 315.1775pt>
+pdf, id=218, 469.755pt x 316.18124pt>
 File: validation_results_files/figure-latex/plot rolling Spanish variances for 
 US-1.pdf Graphic file (type pdf)
 <use validation_results_files/figure-latex/plot rolling Spanish variances for U
 S-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/plot rolling Spa
-nish variances for US-1.pdf  used on input line 1119.
-(pdftex.def)             Requested size: 459.74442pt x 315.19595pt.
-[19 <./validation_results_files/figure-latex/plot rolling Spanish variances for
- US-1.pdf>]
+nish variances for US-1.pdf  used on input line 1455.
+(pdftex.def)             Requested size: 469.75386pt x 316.18047pt.
+[26] [27 <./validation_results_files/figure-latex/plot rolling Spanish variance
+s for US-1.pdf>]
 <validation_results_files/figure-latex/plot rolling Quechua variances for Boliv
-ia-1.pdf, id=184, 459.7175pt x 315.1775pt>
+ia-1.pdf, id=235, 464.73625pt x 316.18124pt>
 File: validation_results_files/figure-latex/plot rolling Quechua variances for 
 Bolivia-1.pdf Graphic file (type pdf)
 <use validation_results_files/figure-latex/plot rolling Quechua variances for B
 olivia-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/plot rolling Que
-chua variances for Bolivia-1.pdf  used on input line 1180.
-(pdftex.def)             Requested size: 459.74442pt x 315.19595pt.
-[20] [21 <./validation_results_files/figure-latex/plot rolling Quechua variance
-s for Bolivia-1.pdf>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1222.
-[22]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1222.
+chua variances for Bolivia-1.pdf  used on input line 1544.
+(pdftex.def)             Requested size: 464.74928pt x 316.19011pt.
+[28] [29 <./validation_results_files/figure-latex/plot rolling Quechua variance
+s for Bolivia-1.pdf>] [30pdfTeX warning (ext4): destination with the same ident
+ifier (name{table.6}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.1671 \end{Shaded}
+                   ]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1673.
+[31]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1673.
 (./validation_results.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1222.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 1222.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1222.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1673.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 1673.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1673.
  ) 
 Here is how much of TeX's memory you used:
- 14984 strings out of 480608
- 221517 string characters out of 5903631
- 533014 words of memory out of 5000000
- 30516 multiletter control sequences out of 15000+600000
- 571235 words of font info for 76 fonts, out of 8000000 for 9000
+ 15013 strings out of 480608
+ 222388 string characters out of 5903631
+ 532736 words of memory out of 5000000
+ 30527 multiletter control sequences out of 15000+600000
+ 571484 words of font info for 79 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,9n,42p,912b,475s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,11n,42p,912b,372s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
 texlive/2020/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}</usr/local/texlive/2020/
 texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2020/texmf-dist
@@ -809,10 +860,10 @@ texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2020/texmf-dist
 /lmr17.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmtk10.pfb
 ></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/loc
 al/texlive/2020/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on validation_results.pdf (22 pages, 300050 bytes).
+Output written on validation_results.pdf (31 pages, 362394 bytes).
 PDF statistics:
- 254 PDF objects out of 1000 (max. 8388607)
- 196 compressed objects within 2 object streams
- 36 named destinations out of 1000 (max. 500000)
- 10308 words of extra memory for PDF output out of 12000 (max. 10000000)
+ 316 PDF objects out of 1000 (max. 8388607)
+ 242 compressed objects within 3 object streams
+ 46 named destinations out of 1000 (max. 500000)
+ 10318 words of extra memory for PDF output out of 12000 (max. 10000000)
 

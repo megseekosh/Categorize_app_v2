@@ -114,7 +114,7 @@
 
 \title{Validation results}
 \author{Meg Cychosz}
-\date{04 December 2020}
+\date{11 December 2020}
 
 \begin{document}
 \maketitle
@@ -337,6 +337,73 @@ Quechua-Spanish (1032) & 263 ( 13.7 \%) & 960 ( 50 \%) & 97 ( 5.38 \%) & 372 ( 2
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{# now simulate 100 minority lang estimates from each child}
+\CommentTok{# take however many clips were used to compute the randomly-sampled estimate}
+\CommentTok{# then compute the prop. of those that are spanish/quechua}
+\CommentTok{# repeat 100X}
+
+\CommentTok{# total_reg_annotations refers to the # of clips used to estimate language prop }
+\CommentTok{# get that variable}
+\NormalTok{random_lang_clips <-}\StringTok{ }\NormalTok{lang_annon }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(method}\OperatorTok{==}\StringTok{'random'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(id, total_lang_annotations)}
+
+\NormalTok{sim_lang_data <-}\StringTok{ }\NormalTok{lang_annon }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(method}\OperatorTok{==}\StringTok{'complete'}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# we're only sampling from all-day annotations}
+\StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{total_lang_annotations) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# this is the # of all-day clips annotated and we want # of random clips}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., random_lang_clips, }\DataTypeTok{by=}\StringTok{'id'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{replicate}\NormalTok{(}\DecValTok{100}\NormalTok{, ., }\DataTypeTok{simplify =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# simulate 100 collections of random clips}
+\StringTok{  }\KeywordTok{map_dfr}\NormalTok{(}\OperatorTok{~}\StringTok{ }\KeywordTok{sample_n}\NormalTok{(., total_lang_annotations), }\DataTypeTok{.id =} \StringTok{"simulation"}\NormalTok{) }\CommentTok{# sample the same # of clips per simulation that were annotated for random sampling}
+  
+\CommentTok{# now compute the Quechua estimate for the Bolivia corpus}
+\NormalTok{que_sim_results <-}\StringTok{ }\NormalTok{sim_lang_data }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(language}\OperatorTok{==}\StringTok{'English/Quechua'} \OperatorTok{&}\StringTok{ }\NormalTok{location}\OperatorTok{==}\StringTok{'Bolivia'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id, simulation) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{distinct}\NormalTok{(file_name, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{n_que=}\KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{distinct}\NormalTok{(id, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{percen_que =}\NormalTok{ n_que }\OperatorTok{/}\StringTok{ }\NormalTok{total_lang_annotations) }\CommentTok{# compute que/to all else}
+
+\CommentTok{# and the Spanish estimate for the US corpus}
+\NormalTok{span_sim_results <-}\StringTok{ }\NormalTok{sim_lang_data }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(language}\OperatorTok{==}\StringTok{'Spanish'} \OperatorTok{&}\StringTok{ }\NormalTok{location}\OperatorTok{==}\StringTok{'US'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id, simulation) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{distinct}\NormalTok{(file_name, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{n_span=}\KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{distinct}\NormalTok{(id, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{percen_span =}\NormalTok{ n_span }\OperatorTok{/}\StringTok{ }\NormalTok{total_lang_annotations) }\CommentTok{# compute span/to all else}
+
+\CommentTok{# now some descriptive stats from those results}
+\CommentTok{# by corpus}
+\NormalTok{que_sim_stats <-}\StringTok{ }\NormalTok{que_sim_results }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{mean_sim_que =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(percen_que),}\DecValTok{2}\NormalTok{),}
+         \DataTypeTok{sd_sim_que =} \KeywordTok{round}\NormalTok{(}\KeywordTok{sd}\NormalTok{(percen_que),}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{sim_stat =} \KeywordTok{paste}\NormalTok{(mean_sim_que,}\StringTok{"("}\NormalTok{,sd_sim_que,}\StringTok{")"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(sim_stat)}
+
+\NormalTok{span_sim_stats <-}\StringTok{ }\NormalTok{span_sim_results }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{mean_sim_span =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(percen_span),}\DecValTok{2}\NormalTok{),}
+         \DataTypeTok{sd_sim_span =} \KeywordTok{round}\NormalTok{(}\KeywordTok{sd}\NormalTok{(percen_span),}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{sim_stat =} \KeywordTok{paste}\NormalTok{(mean_sim_span,}\StringTok{"("}\NormalTok{,sd_sim_span,}\StringTok{")"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(sim_stat)}
+
+\CommentTok{# now the spanish estimate by individual child in US corpus}
+\NormalTok{span_sim_child_stats <-}\StringTok{ }\NormalTok{span_sim_results }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{mean_sim_span =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(percen_span),}\DecValTok{2}\NormalTok{),}
+         \DataTypeTok{sd_sim_span =} \KeywordTok{round}\NormalTok{(}\KeywordTok{sd}\NormalTok{(percen_span),}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{sim_stat_child =} \KeywordTok{paste}\NormalTok{(mean_sim_span,}\StringTok{"("}\NormalTok{,sd_sim_span,}\StringTok{")"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(id, sim_stat_child)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{vars <-}\StringTok{ }\NormalTok{data_annon_cts }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{select}\NormalTok{(percen_ofallclips_drawn, id, method) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{colnames}\NormalTok{(.)  }
@@ -418,44 +485,49 @@ Quechua-Spanish (1032) & 263 ( 13.7 \%) & 960 ( 50 \%) & 97 ( 5.38 \%) & 372 ( 2
 \StringTok{  }\KeywordTok{distinct}\NormalTok{(rel_error_stats)}
 
 \CommentTok{# add correlations to table - will make pretty below}
-\NormalTok{us_lang_tbl <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(us_lang_tbl, us_cor) }\OperatorTok{%>%}
+\NormalTok{us_lang_tbl2 <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(us_lang_tbl, us_cor) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{cbind}\NormalTok{(., us_rel_error) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{cbind}\NormalTok{(., span_sim_stats) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Corpus =} \StringTok{"Spanish-English (Spanish)"}\NormalTok{) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{relocate}\NormalTok{(}\KeywordTok{c}\NormalTok{(Corpus, random, complete))}
+\StringTok{  }\KeywordTok{relocate}\NormalTok{(}\KeywordTok{c}\NormalTok{(Corpus, random, complete, rel_error_stats, sim_stat))}
 
-\NormalTok{bo_lang_tbl <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(bo_lang_tbl, bo_cor) }\OperatorTok{%>%}
+\NormalTok{bo_lang_tbl2 <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(bo_lang_tbl, bo_cor) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{cbind}\NormalTok{(., bo_rel_error) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{cbind}\NormalTok{(., que_sim_stats) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Corpus =} \StringTok{"Quechua-Spanish (Quechua)"}\NormalTok{) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{relocate}\NormalTok{(}\KeywordTok{c}\NormalTok{(Corpus, random, complete)) }
+\StringTok{  }\KeywordTok{relocate}\NormalTok{(}\KeywordTok{c}\NormalTok{(Corpus, random, complete, rel_error_stats, sim_stat)) }
 
-\NormalTok{lang_tbl <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(us_lang_tbl, bo_lang_tbl)}
+\NormalTok{lang_tbl <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(us_lang_tbl2, bo_lang_tbl2)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(lang_tbl, }\DataTypeTok{caption =} \StringTok{'Minority language estimates by corpus and annotation method.'}\NormalTok{, }
+\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(lang_tbl, }\DataTypeTok{caption =} \StringTok{'Average minority language estimates by corpus and annotation method.'}\NormalTok{, }
              \DataTypeTok{booktabs=}\NormalTok{T, }
              \DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }
-             \DataTypeTok{col.names =} \KeywordTok{c}\NormalTok{(}\StringTok{"Corpus (language)"}\NormalTok{, }\StringTok{"Random"}\NormalTok{, }\StringTok{"All-day"}\NormalTok{, }\StringTok{"Correlation between estimates"}\NormalTok{, }\StringTok{"Average relative error (SD)"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+             \DataTypeTok{col.names =} \KeywordTok{c}\NormalTok{(}\StringTok{"Corpus (language)"}\NormalTok{, }\StringTok{"Random"}\NormalTok{, }\StringTok{"All-day"}\NormalTok{, }\StringTok{"Avg. relative error (SD)"}\NormalTok{, }\StringTok{"n=100 simulations of random sampling"}\NormalTok{, }\StringTok{"Correlation between estimates"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DataTypeTok{width =} \StringTok{"4cm"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{    }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DataTypeTok{width =} \StringTok{"3cm"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{5}\OperatorTok{:}\DecValTok{6}\NormalTok{, }\DataTypeTok{width =} \StringTok{"4cm"}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{kable_styling}\NormalTok{() }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{add_header_above}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{, }\StringTok{"Annotation Method"}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{, }\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{add_header_above}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{, }\StringTok{"Annotation Method"}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{, }\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{3}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\NormalTok{kableExtra}\OperatorTok{::}\KeywordTok{kable_styling}\NormalTok{(}\DataTypeTok{latex_options =} \StringTok{"hold_position"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{table}[!h]
 
-\caption{(\#tab:generate lang tables)Minority language estimates by corpus and annotation method.}
+\caption{(\#tab:generate lang tables)Average minority language estimates by corpus and annotation method.}
 \centering
-\begin{tabular}[t]{lllll}
+\begin{tabular}[t]{>{\raggedright\arraybackslash}p{4cm}ll>{\raggedright\arraybackslash}p{3cm}>{\raggedright\arraybackslash}p{4cm}>{\raggedright\arraybackslash}p{4cm}}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Annotation Method} & \multicolumn{2}{c}{ } \\
+\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Annotation Method} & \multicolumn{3}{c}{ } \\
 \cmidrule(l{3pt}r{3pt}){2-3}
-Corpus (language) & Random & All-day & Correlation between estimates & Average relative error (SD)\\
+Corpus (language) & Random & All-day & Avg. relative error (SD) & n=100 simulations of random sampling & Correlation between estimates\\
 \midrule
-Spanish-English (Spanish) & 0.75 ( 0.13 ) & 0.69 ( 0.12 ) & r= 0.96 , p= 0.01 & 5.36 ( 4.82 )\\
-Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11.02 ( 4.28 )\\
+Spanish-English (Spanish) & 0.75 ( 0.13 ) & 0.69 ( 0.12 ) & 5.36 ( 4.82 ) & 0.72 ( 0.13 ) & r= 0.96 , p= 0.01\\
+Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & 11.02 ( 4.28 ) & 0.48 ( 0.13 ) & r= 0.9 , p= 0.04\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -572,11 +644,16 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
 \StringTok{  }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{position=}\StringTok{'stack'}\NormalTok{, }\DataTypeTok{stat=}\StringTok{'identity'}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{facet_grid}\NormalTok{(}\OperatorTok{~}\NormalTok{id) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{'annotation method'}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Proportion of language categories, by child and annotation method"}\NormalTok{,}
-       \DataTypeTok{subtitle =} \StringTok{"Quechua-Spanish corpus                                          Spanish-English corpus"}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust =} \FloatTok{.9}\NormalTok{, }\DataTypeTok{vjust=}\NormalTok{.}\DecValTok{8}\NormalTok{),}
+\StringTok{    }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =} \StringTok{"Quechua-Spanish corpus                       Spanish-English corpus"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\CommentTok{#labs(title="Proportion of language categories, by child and annotation method",}
+\StringTok{   }\CommentTok{#    subtitle = "Quechua-Spanish corpus                                          Spanish-English corpus") +}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust =} \FloatTok{.9}\NormalTok{, }\DataTypeTok{vjust=}\NormalTok{.}\DecValTok{8}\NormalTok{, }\DataTypeTok{size=}\DecValTok{11}\NormalTok{),}
         \DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{),}
-        \DataTypeTok{plot.subtitle =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{color=}\StringTok{'gray57'}\NormalTok{,}\DataTypeTok{hjust =} \FloatTok{.55}\NormalTok{))}
+        \DataTypeTok{plot.subtitle =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{color=}\StringTok{'gray50'}\NormalTok{,}\DataTypeTok{hjust =} \FloatTok{.55}\NormalTok{, }\DataTypeTok{face=}\StringTok{'bold'}\NormalTok{, }\DataTypeTok{size=}\DecValTok{14}\NormalTok{),}
+        \DataTypeTok{axis.title=}\KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{17}\NormalTok{,}\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{),}
+        \DataTypeTok{legend.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{,}\DataTypeTok{face =} \StringTok{"bold"}\NormalTok{),}
+        \DataTypeTok{legend.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{13}\NormalTok{),}
+        \DataTypeTok{strip.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{9}\NormalTok{, }\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{))}
 \NormalTok{lang_props}
 \end{Highlighting}
 \end{Shaded}
@@ -596,8 +673,8 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
 ##   2
 \end{verbatim}
 
-\hypertarget{chid-directed-speech-across-random-and-full-methods}{%
-\subsubsection{Chid-directed speech across random and full methods}\label{chid-directed-speech-across-random-and-full-methods}}
+\hypertarget{child-directed-speech-across-random-and-full-methods}{%
+\subsubsection{Child-directed speech across random and full methods}\label{child-directed-speech-across-random-and-full-methods}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -643,6 +720,63 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{# now simulate 100 CDS estimates from each child}
+\CommentTok{# take however many clips were used to compute the randomly-sampled estimate}
+\CommentTok{# then compute the prop. of those that are CDS}
+\CommentTok{# repeat 100X}
+
+\CommentTok{# total_reg_annotations refers to the # of clips used to estimate speech register }
+\CommentTok{# get that variable}
+\NormalTok{random_clips <-}\StringTok{ }\NormalTok{reg_annon }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(method}\OperatorTok{==}\StringTok{'random'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(id, total_reg_annotations)}
+
+\NormalTok{sim_data <-}\StringTok{ }\NormalTok{reg_annon }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(method}\OperatorTok{==}\StringTok{'complete'}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# we're only sampling from all-day annotations}
+\StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{total_reg_annotations) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# this is the # of all-day clips annotated and we want # of random clips}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., random_clips, }\DataTypeTok{by=}\StringTok{'id'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{replicate}\NormalTok{(}\DecValTok{100}\NormalTok{, ., }\DataTypeTok{simplify =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# simulate 100 collections of random clips}
+\StringTok{  }\KeywordTok{map_dfr}\NormalTok{(}\OperatorTok{~}\StringTok{ }\KeywordTok{sample_n}\NormalTok{(., total_reg_annotations), }\DataTypeTok{.id =} \StringTok{"simulation"}\NormalTok{) }\CommentTok{# sample the same # of clips per simulation that were annotated for random sampling}
+  
+\CommentTok{# now compute the CDS estimate}
+\NormalTok{cds_sim_results <-}\StringTok{ }\NormalTok{sim_data }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id, simulation) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(addressee}\OperatorTok{==}\StringTok{'Adult2TargetChild'} \OperatorTok{|}\StringTok{ }\NormalTok{addressee}\OperatorTok{==}\StringTok{'Otherchild2TargetChild'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{n_cds =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# # of CDS clips }
+\StringTok{  }\KeywordTok{distinct}\NormalTok{(id, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{percen_cds =}\NormalTok{ n_cds }\OperatorTok{/}\StringTok{ }\NormalTok{total_reg_annotations)}
+
+\CommentTok{# now some descriptive stats from those results}
+\NormalTok{cds_sim_stats <-}\StringTok{ }\NormalTok{cds_sim_results }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{mean_sim_cds =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(percen_cds),}\DecValTok{2}\NormalTok{),}
+         \DataTypeTok{sd_sim_cds =} \KeywordTok{round}\NormalTok{(}\KeywordTok{sd}\NormalTok{(percen_cds),}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{sim_stat =} \KeywordTok{paste}\NormalTok{(mean_sim_cds,}\StringTok{"("}\NormalTok{,sd_sim_cds,}\StringTok{")"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(id, sim_stat)}
+
+\CommentTok{# now compute the ADS estimate}
+\NormalTok{ads_sim_results <-}\StringTok{ }\NormalTok{sim_data }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id, simulation) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(addressee}\OperatorTok{==}\StringTok{'Adult2Others'} \OperatorTok{|}\StringTok{ }\NormalTok{addressee}\OperatorTok{==}\StringTok{'Otherchild2adults'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{n_ads =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# # of CDS clips }
+\StringTok{  }\KeywordTok{distinct}\NormalTok{(id, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{percen_ads =}\NormalTok{ n_ads }\OperatorTok{/}\StringTok{ }\NormalTok{total_reg_annotations)}
+
+\CommentTok{# now some descriptive stats from those results}
+\NormalTok{ads_sim_stats <-}\StringTok{ }\NormalTok{ads_sim_results }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(location) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{mean_sim_ads =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(percen_ads),}\DecValTok{2}\NormalTok{),}
+         \DataTypeTok{sd_sim_ads =} \KeywordTok{round}\NormalTok{(}\KeywordTok{sd}\NormalTok{(percen_ads),}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{sim_stat_ads =} \KeywordTok{paste}\NormalTok{(mean_sim_ads,}\StringTok{"("}\NormalTok{,sd_sim_ads,}\StringTok{")"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(location, sim_stat_ads)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{# for later}
 \NormalTok{percen_cds_df <-}\StringTok{ }\NormalTok{o3 }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id, method), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
@@ -652,11 +786,15 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
 \NormalTok{cds_plot_data <-}\StringTok{ }\NormalTok{o3 }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{select}\NormalTok{(id, gender, location, num_clips, method, percen_cds) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{spread}\NormalTok{(}\StringTok{"method"}\NormalTok{, }\StringTok{"percen_cds"}\NormalTok{) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{merge}\NormalTok{(., percen_cds_df, }\DataTypeTok{by=}\StringTok{'id'}\NormalTok{)}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., percen_cds_df, }\DataTypeTok{by=}\StringTok{'id'}\NormalTok{) }
 
 \CommentTok{# compute correlations}
 \NormalTok{cds_cors <-}\StringTok{ }\NormalTok{cds_plot_data }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{group_by}\NormalTok{(location) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(., }\KeywordTok{paste}\NormalTok{(}\StringTok{"r="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(complete, random)}\OperatorTok{$}\NormalTok{estimate,}\DecValTok{2}\NormalTok{),}\StringTok{","}\NormalTok{,}\StringTok{"p="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(complete, random)}\OperatorTok{$}\NormalTok{p.value,}\DecValTok{2}\NormalTok{)))}
+
+\CommentTok{# also do a correlation for both corpora}
+\NormalTok{cds_cors_all <-}\StringTok{ }\NormalTok{cds_plot_data }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{summarize}\NormalTok{(., }\KeywordTok{paste}\NormalTok{(}\StringTok{"r="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(complete, random)}\OperatorTok{$}\NormalTok{estimate,}\DecValTok{2}\NormalTok{),}\StringTok{","}\NormalTok{,}\StringTok{"p="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(complete, random)}\OperatorTok{$}\NormalTok{p.value,}\DecValTok{2}\NormalTok{)))}
 
 \CommentTok{#reg_tbl <- o3 %>%}
@@ -682,8 +820,10 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
 
 
 
-\CommentTok{# add correlations to table - will make pretty below}
-\NormalTok{final_reg_tbl <-}\StringTok{ }\KeywordTok{merge}\NormalTok{(cds_rel_error, cds_cors, }\DataTypeTok{by=}\StringTok{'location'}\NormalTok{)}
+\CommentTok{# add correlations and simulated stats to table - will make pretty below}
+\NormalTok{final_reg_tbl <-}\StringTok{ }\NormalTok{cds_rel_error }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., cds_cors, }\DataTypeTok{by=}\StringTok{'location'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., cds_sim_stats, }\DataTypeTok{by=}\StringTok{'id'}\NormalTok{)}
 
 \NormalTok{final_reg_tbl}\OperatorTok{$}\NormalTok{location <-}\StringTok{ }
 \StringTok{  }\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(final_reg_tbl}\OperatorTok{$}\NormalTok{location, }
@@ -695,44 +835,44 @@ Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & r= 0.9 , p= 0.04 & 11
          \DataTypeTok{complete =} \KeywordTok{round}\NormalTok{(complete,}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{corpus_id =} \KeywordTok{paste}\NormalTok{(location,}\StringTok{"("}\NormalTok{,id,}\StringTok{")"}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{location, }\OperatorTok{-}\NormalTok{id) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{relocate}\NormalTok{(corpus_id, random, complete)}
+\StringTok{  }\KeywordTok{relocate}\NormalTok{(corpus_id, random, complete, relative_error, sim_stat)}
   
 
 
-\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(final_reg_tbl2, }\DataTypeTok{caption =} \StringTok{'Child-directed speech estimates by child and annotation method.'}\NormalTok{, }
+\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(final_reg_tbl2, }\DataTypeTok{caption =} \StringTok{'Target child-directed speech estimates by child and annotation method.'}\NormalTok{, }
              \DataTypeTok{booktabs=}\NormalTok{T, }
              \DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }
-             \DataTypeTok{col.names =} \KeywordTok{c}\NormalTok{(}\StringTok{"Corpus (ID)"}\NormalTok{, }\StringTok{"Random"}\NormalTok{, }\StringTok{"All-day"}\NormalTok{, }\StringTok{"Relative error"}\NormalTok{, }\StringTok{"Within-corpus correlation between estimates"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# "}
-\StringTok{  }\CommentTok{#column_spec(2, width = "4cm") %>% # force column headers onto two rows}
-\StringTok{  }\CommentTok{#column_spec(3, width = "3cm") %>%}
-\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DataTypeTok{width =} \StringTok{"5cm"}\NormalTok{) }\OperatorTok{%>%}
+             \DataTypeTok{col.names =} \KeywordTok{c}\NormalTok{(}\StringTok{"Corpus (ID)"}\NormalTok{, }\StringTok{"Random"}\NormalTok{, }\StringTok{"All-day"}\NormalTok{, }\StringTok{"Relative error"}\NormalTok{, }\StringTok{"n=100 simulations of random sampling"}\NormalTok{, }\StringTok{"Within-corpus correlation between random and all-day estimates"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# "}
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DataTypeTok{width =} \StringTok{"4cm"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# force column headers onto two rows}
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DataTypeTok{width =} \StringTok{"3cm"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{5}\OperatorTok{:}\DecValTok{6}\NormalTok{, }\DataTypeTok{width =} \StringTok{"4cm"}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{kable_styling}\NormalTok{() }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{add_header_above}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{, }\StringTok{"Annotation Method"}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{, }\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{add_header_above}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{, }\StringTok{"Annotation Method"}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{, }\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{3}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\NormalTok{kableExtra}\OperatorTok{::}\KeywordTok{kable_styling}\NormalTok{(}\DataTypeTok{latex_options =} \StringTok{"hold_position"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{table}[!h]
 
-\caption{(\#tab:cds proportion stats)Child-directed speech estimates by child and annotation method.}
+\caption{(\#tab:cds proportion stats)Target child-directed speech estimates by child and annotation method.}
 \centering
-\begin{tabular}[t]{lrrr>{\raggedright\arraybackslash}p{5cm}}
+\begin{tabular}[t]{>{\raggedright\arraybackslash}p{4cm}rr>{\raggedleft\arraybackslash}p{3cm}>{\raggedright\arraybackslash}p{4cm}>{\raggedright\arraybackslash}p{4cm}}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Annotation Method} & \multicolumn{2}{c}{ } \\
+\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Annotation Method} & \multicolumn{3}{c}{ } \\
 \cmidrule(l{3pt}r{3pt}){2-3}
-Corpus (ID) & Random & All-day & Relative error & Within-corpus correlation between estimates\\
+Corpus (ID) & Random & All-day & Relative error & n=100 simulations of random sampling & Within-corpus correlation between random and all-day estimates\\
 \midrule
-Quechua-Spanish ( 1032 ) & 0.19 & 0.17 & 11.53 & r= 0.64 , p= 0.24\\
-Quechua-Spanish ( 1060 ) & 0.12 & 0.07 & 55.09 & r= 0.64 , p= 0.24\\
-Quechua-Spanish ( 1075 ) & 0.12 & 0.14 & 12.50 & r= 0.64 , p= 0.24\\
-Quechua-Spanish ( 1077 ) & 0.10 & 0.11 & 10.48 & r= 0.64 , p= 0.24\\
-Quechua-Spanish ( 1081 ) & 0.13 & 0.05 & 145.09 & r= 0.64 , p= 0.24\\
+Quechua-Spanish ( 1032 ) & 0.19 & 0.17 & 11.53 & 0.17 ( 0.03 ) & r= 0.64 , p= 0.24\\
+Quechua-Spanish ( 1060 ) & 0.12 & 0.07 & 55.09 & 0.07 ( 0.02 ) & r= 0.64 , p= 0.24\\
+Quechua-Spanish ( 1075 ) & 0.12 & 0.14 & 12.50 & 0.14 ( 0.03 ) & r= 0.64 , p= 0.24\\
+Quechua-Spanish ( 1077 ) & 0.10 & 0.11 & 10.48 & 0.11 ( 0.03 ) & r= 0.64 , p= 0.24\\
+Quechua-Spanish ( 1081 ) & 0.13 & 0.05 & 145.09 & 0.05 ( 0.02 ) & r= 0.64 , p= 0.24\\
 \addlinespace
-Spanish-English ( 179 ) & 0.53 & 0.47 & 13.24 & r= 0.97 , p= 0.01\\
-Spanish-English ( 198-9mo ) & 0.65 & 0.66 & 1.09 & r= 0.97 , p= 0.01\\
-Spanish-English ( 199 ) & 0.29 & 0.31 & 6.06 & r= 0.97 , p= 0.01\\
-Spanish-English ( 261-8mo ) & 0.80 & 0.82 & 2.37 & r= 0.97 , p= 0.01\\
-Spanish-English ( 267-12mo ) & 0.40 & 0.47 & 15.23 & r= 0.97 , p= 0.01\\
+Spanish-English ( 179 ) & 0.53 & 0.47 & 13.24 & 0.47 ( 0.04 ) & r= 0.97 , p= 0.01\\
+Spanish-English ( 198-9mo ) & 0.65 & 0.66 & 1.09 & 0.66 ( 0.06 ) & r= 0.97 , p= 0.01\\
+Spanish-English ( 199 ) & 0.29 & 0.31 & 6.06 & 0.32 ( 0.04 ) & r= 0.97 , p= 0.01\\
+Spanish-English ( 261-8mo ) & 0.80 & 0.82 & 2.37 & 0.83 ( 0.03 ) & r= 0.97 , p= 0.01\\
+Spanish-English ( 267-12mo ) & 0.40 & 0.47 & 15.23 & 0.47 ( 0.04 ) & r= 0.97 , p= 0.01\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -773,19 +913,26 @@ Spanish-English ( 267-12mo ) & 0.40 & 0.47 & 15.23 & r= 0.97 , p= 0.01\\
 \StringTok{  }\KeywordTok{distinct}\NormalTok{(rel_error_stats)}
 
 \CommentTok{# add correlations to table - will make pretty below}
-\NormalTok{final_reg_tbl <-}\StringTok{ }\KeywordTok{merge}\NormalTok{(reg_tbl, ads_cors, }\DataTypeTok{by=}\StringTok{'location'}\NormalTok{)}
-\NormalTok{final_reg_tbl2 <-}\StringTok{ }\KeywordTok{merge}\NormalTok{(final_reg_tbl, ads_rel_error, }\DataTypeTok{by=}\StringTok{'location'}\NormalTok{)}
+\NormalTok{final_reg_tbl <-}\StringTok{ }\NormalTok{reg_tbl }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., ads_cors, }\DataTypeTok{by=}\StringTok{'location'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., ads_rel_error, }\DataTypeTok{by=}\StringTok{'location'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., ads_sim_stats, }\DataTypeTok{by=}\StringTok{'location'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{relocate}\NormalTok{(location, random, complete, rel_error_stats, sim_stat_ads)}
+
 \NormalTok{final_reg_tbl}\OperatorTok{$}\NormalTok{location <-}\StringTok{ }
 \StringTok{  }\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(final_reg_tbl}\OperatorTok{$}\NormalTok{location, }
                   \DataTypeTok{from =} \KeywordTok{c}\NormalTok{(}\StringTok{"Bolivia"}\NormalTok{, }\StringTok{"US"}\NormalTok{), }
                   \DataTypeTok{to =}\KeywordTok{c}\NormalTok{(}\StringTok{"Quechua-Spanish"}\NormalTok{, }\StringTok{"Spanish-English"}\NormalTok{))}
 
-\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(final_reg_tbl2, }\DataTypeTok{caption =} \StringTok{'Average adult-directed speech estimates by corpus and annotation method.'}\NormalTok{, }
+\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(final_reg_tbl, }\DataTypeTok{caption =} \StringTok{'Average adult-directed speech estimates by corpus and annotation method.'}\NormalTok{, }
              \DataTypeTok{booktabs=}\NormalTok{T, }
              \DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }
-             \DataTypeTok{col.names =} \KeywordTok{c}\NormalTok{(}\StringTok{"Corpus"}\NormalTok{, }\StringTok{"Random"}\NormalTok{, }\StringTok{"All-day"}\NormalTok{, }\StringTok{"Correlation between estimates"}\NormalTok{, }\StringTok{"Average relative error (SD)"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+             \DataTypeTok{col.names =} \KeywordTok{c}\NormalTok{(}\StringTok{"Corpus"}\NormalTok{, }\StringTok{"Random"}\NormalTok{, }\StringTok{"All-day"}\NormalTok{, }\StringTok{"Average relative error (SD)"}\NormalTok{, }\StringTok{"n=100 simulations of random sampling"}\NormalTok{,  }\StringTok{"Correlation between estimates"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DataTypeTok{width =} \StringTok{"3.5cm"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DataTypeTok{width =} \StringTok{"3cm"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{5}\OperatorTok{:}\DecValTok{6}\NormalTok{, }\DataTypeTok{width =} \StringTok{"4cm"}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{kable_styling}\NormalTok{() }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{add_header_above}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{, }\StringTok{"Annotation Method"}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{, }\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{add_header_above}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{, }\StringTok{"Annotation Method"}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{, }\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{3}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\NormalTok{kableExtra}\OperatorTok{::}\KeywordTok{kable_styling}\NormalTok{(}\DataTypeTok{latex_options =} \StringTok{"hold_position"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -794,14 +941,14 @@ Spanish-English ( 267-12mo ) & 0.40 & 0.47 & 15.23 & r= 0.97 , p= 0.01\\
 
 \caption{(\#tab:ads proportion stats)Average adult-directed speech estimates by corpus and annotation method.}
 \centering
-\begin{tabular}[t]{lllll}
+\begin{tabular}[t]{>{\raggedright\arraybackslash}p{3.5cm}ll>{\raggedright\arraybackslash}p{3cm}>{\raggedright\arraybackslash}p{4cm}>{\raggedright\arraybackslash}p{4cm}}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Annotation Method} & \multicolumn{2}{c}{ } \\
+\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Annotation Method} & \multicolumn{3}{c}{ } \\
 \cmidrule(l{3pt}r{3pt}){2-3}
-Corpus & Random & All-day & Correlation between estimates & Average relative error (SD)\\
+Corpus & Random & All-day & Average relative error (SD) & n=100 simulations of random sampling & Correlation between estimates\\
 \midrule
-Bolivia & 0.48 ( 0.14 ) & 0.42 ( 0.11 ) & r= 0.84 , p= 0.08 & 12.17 ( 12.56 )\\
-US & 0.27 ( 0.17 ) & 0.27 ( 0.2 ) & r= 0.95 , p= 0.01 & 17.57 ( 12.74 )\\
+Quechua-Spanish & 0.42 ( 0.11 ) & 0.48 ( 0.14 ) & 12.17 ( 12.56 ) & 0.48 ( 0.13 ) & r= 0.84 , p= 0.08\\
+Spanish-English & 0.27 ( 0.2 ) & 0.27 ( 0.17 ) & 17.57 ( 12.74 ) & 0.27 ( 0.16 ) & r= 0.95 , p= 0.01\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -857,16 +1004,21 @@ US & 0.27 ( 0.17 ) & 0.27 ( 0.2 ) & r= 0.95 , p= 0.01 & 17.57 ( 12.74 )\\
 \StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id, proportion, register), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{method=}\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(method, }\StringTok{"complete"}\NormalTok{, }\StringTok{"all-day"}\NormalTok{),}
          \DataTypeTok{id=}\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(id, }\KeywordTok{c}\NormalTok{(}\StringTok{"198-9mo"}\NormalTok{, }\StringTok{"261-8mo"}\NormalTok{, }\StringTok{"267-12mo"}\NormalTok{), }\KeywordTok{c}\NormalTok{(}\StringTok{"198"}\NormalTok{, }\StringTok{"261"}\NormalTok{, }\StringTok{"267"}\NormalTok{)),}
-         \DataTypeTok{register=}\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(register, }\KeywordTok{c}\NormalTok{(}\StringTok{"percen_cds"}\NormalTok{, }\StringTok{"percen_ods"}\NormalTok{, }\StringTok{"percen_ads"}\NormalTok{), }\KeywordTok{c}\NormalTok{(}\StringTok{"Child-directed speech"}\NormalTok{, }\StringTok{"Other-directed speech"}\NormalTok{, }\StringTok{"Adult-directed speech"}\NormalTok{))) }\OperatorTok{%>%}
+         \DataTypeTok{register=}\NormalTok{plyr}\OperatorTok{::}\KeywordTok{mapvalues}\NormalTok{(register, }\KeywordTok{c}\NormalTok{(}\StringTok{"percen_cds"}\NormalTok{, }\StringTok{"percen_ods"}\NormalTok{, }\StringTok{"percen_ads"}\NormalTok{), }\KeywordTok{c}\NormalTok{(}\StringTok{"Target child-directed }\CharTok{\textbackslash{}n}\StringTok{ speech"}\NormalTok{, }\StringTok{"Other child-directed }\CharTok{\textbackslash{}n}\StringTok{ speech"}\NormalTok{, }\StringTok{"Adult-directed }\CharTok{\textbackslash{}n}\StringTok{ speech"}\NormalTok{))) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{ggplot}\NormalTok{(., }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{fill=}\NormalTok{register, }\DataTypeTok{y=}\NormalTok{proportion, }\DataTypeTok{x=}\NormalTok{method)) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{position=}\StringTok{'stack'}\NormalTok{, }\DataTypeTok{stat=}\StringTok{'identity'}\NormalTok{) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{facet_grid}\NormalTok{(}\OperatorTok{~}\NormalTok{id) }\OperatorTok{+}
 \StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{'annotation method'}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title=}\StringTok{"Proportion of speech register categories, by child and annotation method"}\NormalTok{,}
-       \DataTypeTok{subtitle =} \StringTok{"Quechua-Spanish corpus                                       Spanish-English corpus"}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust =} \FloatTok{.9}\NormalTok{, }\DataTypeTok{vjust=}\NormalTok{.}\DecValTok{8}\NormalTok{),}
+\StringTok{   }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{subtitle =} \StringTok{"Quechua-Spanish corpus                   Spanish-English corpus"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\CommentTok{#labs(title="Proportion of speech register categories, by child and annotation method",}
+\StringTok{       }\CommentTok{#subtitle = "Quechua-Spanish corpus                                       Spanish-English corpus") +}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{hjust =} \FloatTok{.9}\NormalTok{, }\DataTypeTok{vjust=}\NormalTok{.}\DecValTok{8}\NormalTok{, }\DataTypeTok{size=}\DecValTok{11}\NormalTok{),}
         \DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{),}
-        \DataTypeTok{plot.subtitle =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{color=}\StringTok{'gray57'}\NormalTok{,}\DataTypeTok{hjust =} \FloatTok{.55}\NormalTok{))}
+        \DataTypeTok{plot.subtitle =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{color=}\StringTok{'gray50'}\NormalTok{,}\DataTypeTok{hjust =} \FloatTok{.55}\NormalTok{, }\DataTypeTok{face=}\StringTok{'bold'}\NormalTok{, }\DataTypeTok{size=}\DecValTok{14}\NormalTok{),}
+        \DataTypeTok{axis.title=}\KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{17}\NormalTok{,}\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{),}
+        \DataTypeTok{legend.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{,}\DataTypeTok{face =} \StringTok{"bold"}\NormalTok{),}
+        \DataTypeTok{legend.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{13}\NormalTok{),}
+        \DataTypeTok{strip.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{9}\NormalTok{, }\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{))}
 \NormalTok{reg_props}
 \end{Highlighting}
 \end{Shaded}
@@ -902,7 +1054,8 @@ US & 0.27 ( 0.17 ) & 0.27 ( 0.2 ) & r= 0.95 , p= 0.01 & 17.57 ( 12.74 )\\
 \StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{percen_ofallclips_drawn, }\OperatorTok{-}\NormalTok{percen_mxd, }\OperatorTok{-}\NormalTok{percen_que, }\OperatorTok{-}\NormalTok{speech_clips, }\OperatorTok{-}\NormalTok{total, }\OperatorTok{-}\NormalTok{gender, }\OperatorTok{-}\NormalTok{location, }\OperatorTok{-}\NormalTok{num_clips) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{percen_span =} \KeywordTok{round}\NormalTok{(percen_span,}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{spread}\NormalTok{(}\StringTok{"method"}\NormalTok{, }\StringTok{"percen_span"}\NormalTok{) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{relocate}\NormalTok{(id, random, complete, ques_est)}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., span_sim_child_stats, }\DataTypeTok{by=}\StringTok{'id'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{relocate}\NormalTok{(id, random, complete, sim_stat_child)}
 
 \CommentTok{# compute correlations}
 \NormalTok{ques_random_cors <-}\StringTok{ }\NormalTok{ques_tbl }\OperatorTok{%>%}
@@ -916,9 +1069,10 @@ US & 0.27 ( 0.17 ) & 0.27 ( 0.2 ) & r= 0.95 , p= 0.01 & 17.57 ( 12.74 )\\
 \NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(ques_tbl, }\DataTypeTok{caption =} \StringTok{'Spanish language estimates in U.S. corpus, by child and estimation method.'}\NormalTok{, }
              \DataTypeTok{booktabs=}\NormalTok{T, }
              \DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }
-             \DataTypeTok{col.names =} \KeywordTok{c}\NormalTok{(}\StringTok{"Child ID"}\NormalTok{, }\StringTok{"Random"}\NormalTok{, }\StringTok{"All-day"}\NormalTok{, }\StringTok{"Parental Questionnaire"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+             \DataTypeTok{col.names =} \KeywordTok{c}\NormalTok{(}\StringTok{"Child ID"}\NormalTok{, }\StringTok{"Random"}\NormalTok{, }\StringTok{"All-day"}\NormalTok{, }\StringTok{"n=100 simulations of random sampling"}\NormalTok{, }\StringTok{"Parental Questionnaire"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{4}\OperatorTok{:}\DecValTok{5}\NormalTok{, }\DataTypeTok{width =} \StringTok{"4cm"}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{kable_styling}\NormalTok{() }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{add_header_above}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{, }\StringTok{"From daylong recording"}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{, }\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{add_header_above}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{, }\StringTok{"From daylong recording"}\NormalTok{ =}\StringTok{ }\DecValTok{3}\NormalTok{, }\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\NormalTok{kableExtra}\OperatorTok{::}\KeywordTok{kable_styling}\NormalTok{(}\DataTypeTok{latex_options =} \StringTok{"hold_position"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -927,17 +1081,17 @@ US & 0.27 ( 0.17 ) & 0.27 ( 0.2 ) & r= 0.95 , p= 0.01 & 17.57 ( 12.74 )\\
 
 \caption{(\#tab:make table for questionnaire method)Spanish language estimates in U.S. corpus, by child and estimation method.}
 \centering
-\begin{tabular}[t]{lrrl}
+\begin{tabular}[t]{lrr>{\raggedright\arraybackslash}p{4cm}>{\raggedright\arraybackslash}p{4cm}}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{2}{c}{From daylong recording} & \multicolumn{1}{c}{ } \\
-\cmidrule(l{3pt}r{3pt}){2-3}
-Child ID & Random & All-day & Parental Questionnaire\\
+\multicolumn{1}{c}{ } & \multicolumn{3}{c}{From daylong recording} & \multicolumn{1}{c}{ } \\
+\cmidrule(l{3pt}r{3pt}){2-4}
+Child ID & Random & All-day & n=100 simulations of random sampling & Parental Questionnaire\\
 \midrule
-179 & 0.57 & 0.57 & .71\\
-198-9mo & 0.87 & 0.78 & .57\\
-199 & 0.76 & 0.70 & .94\\
-261-8mo & 0.69 & 0.65 & .69\\
-267-12mo & 0.92 & 0.92 & .87\\
+179 & 0.57 & 0.57 & 0.56 ( 0.04 ) & .71\\
+198-9mo & 0.87 & 0.78 & 0.78 ( 0.04 ) & .57\\
+199 & 0.76 & 0.70 & 0.7 ( 0.03 ) & .94\\
+261-8mo & 0.69 & 0.65 & 0.66 ( 0.05 ) & .69\\
+267-12mo & 0.92 & 0.92 & 0.92 ( 0.02 ) & .87\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -962,7 +1116,7 @@ Child ID & Random & All-day & Parental Questionnaire\\
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{percen_span_cds =} \KeywordTok{round}\NormalTok{(n_span_cds }\OperatorTok{/}\StringTok{ }\NormalTok{total_cds_annotations,}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{select}\NormalTok{(method, percen_span_cds, id, ques_est) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{spread}\NormalTok{(}\StringTok{"method"}\NormalTok{, }\StringTok{"percen_span_cds"}\NormalTok{) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{relocate}\NormalTok{(id, random, complete, ques_est) }
+\StringTok{  }\KeywordTok{relocate}\NormalTok{(id, random, complete) }
 
 \CommentTok{# compute correlations}
 \KeywordTok{cor.test}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(span_cds_tbl}\OperatorTok{$}\NormalTok{ques_est), span_cds_tbl}\OperatorTok{$}\NormalTok{complete)}
@@ -1005,33 +1159,74 @@ Child ID & Random & All-day & Parental Questionnaire\\
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{# simulate 100 estimates from random samples}
+\CommentTok{# total_cds_annotations refers to the # of clips used to estimate CDS*spanish  }
+\CommentTok{# what prop. of totalCDS are spoken in Spanish?}
+\NormalTok{random_cds_clips <-}\StringTok{ }\NormalTok{reg_annon }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(method}\OperatorTok{==}\StringTok{'random'} \OperatorTok{&}\StringTok{ }\NormalTok{location}\OperatorTok{==}\StringTok{'US'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id), }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ungroup}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(id, total_cds_annotations)}
+
+\NormalTok{cdsspan_sim_data <-}\StringTok{ }\NormalTok{reg_annon }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(method}\OperatorTok{==}\StringTok{'complete'} \OperatorTok{&}\StringTok{ }\NormalTok{location}\OperatorTok{==}\StringTok{'US'}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# we're only sampling from all-day annotations}
+\StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{total_cds_annotations) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# this is the # of all-day clips annotated and we want # of random clips}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., random_cds_clips, }\DataTypeTok{by=}\StringTok{'id'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{replicate}\NormalTok{(}\DecValTok{100}\NormalTok{, ., }\DataTypeTok{simplify =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# simulate 100 collections of random clips}
+\StringTok{  }\KeywordTok{map_dfr}\NormalTok{(}\OperatorTok{~}\StringTok{ }\KeywordTok{sample_n}\NormalTok{(., total_cds_annotations), }\DataTypeTok{.id =} \StringTok{"simulation"}\NormalTok{) }\CommentTok{# sample the same # of clips per simulation that were annotated for random sampling}
+
+\CommentTok{# now compute the CDS*spanish estimate}
+\NormalTok{cdsspan_sim_results <-}\StringTok{ }\NormalTok{cdsspan_sim_data }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id, simulation) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(language}\OperatorTok{==}\StringTok{'Spanish'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{n_cdsspan =} \KeywordTok{n}\NormalTok{()) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# # of spanish clips amongst these CDS clips}
+\StringTok{  }\KeywordTok{distinct}\NormalTok{(id, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{percen_cdsspan =}\NormalTok{ n_cdsspan }\OperatorTok{/}\StringTok{ }\NormalTok{total_cds_annotations)}
+
+\CommentTok{# now some descriptive stats from those results}
+\NormalTok{cdsspan_sim_stats <-}\StringTok{ }\NormalTok{cdsspan_sim_results }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{mean_sim_cdsspan =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(percen_cdsspan),}\DecValTok{2}\NormalTok{),}
+            \DataTypeTok{sd_sim_cdsspan =} \KeywordTok{round}\NormalTok{(}\KeywordTok{sd}\NormalTok{(percen_cdsspan),}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{sim_stat_cdsspan =} \KeywordTok{paste}\NormalTok{(mean_sim_cdsspan,}\StringTok{"("}\NormalTok{,sd_sim_cdsspan,}\StringTok{")"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(id, sim_stat_cdsspan)}
+
+\CommentTok{# now combine the simulated data with the span*cds table}
+\NormalTok{span_cds_tbl2 <-}\StringTok{ }\NormalTok{span_cds_tbl }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., cdsspan_sim_stats, }\DataTypeTok{by=}\StringTok{'id'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{relocate}\NormalTok{(id, random, complete, sim_stat_cdsspan)}
+
+
 \CommentTok{# create table}
-\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(span_cds_tbl, }\DataTypeTok{caption =} \StringTok{'Spanish language in child-directed speech }\CharTok{\textbackslash{}n}\StringTok{ estimates in U.S. corpus, by child and estimation method.'}\NormalTok{, }
+\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(span_cds_tbl2, }\DataTypeTok{caption =} \StringTok{'Spanish language in child-directed speech }\CharTok{\textbackslash{}n}\StringTok{ estimates in U.S. corpus, by child and estimation method.'}\NormalTok{, }
              \DataTypeTok{booktabs=}\NormalTok{T, }
              \DataTypeTok{row.names =} \OtherTok{FALSE}\NormalTok{, }
-             \DataTypeTok{col.names =} \KeywordTok{c}\NormalTok{(}\StringTok{"Child ID"}\NormalTok{, }\StringTok{"Random"}\NormalTok{, }\StringTok{"All-day"}\NormalTok{, }\StringTok{"Parental Questionnaire"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+             \DataTypeTok{col.names =} \KeywordTok{c}\NormalTok{(}\StringTok{"Child ID"}\NormalTok{, }\StringTok{"Random"}\NormalTok{, }\StringTok{"All-day"}\NormalTok{, }\StringTok{"n=100 simulations of random sampling"}\NormalTok{, }\StringTok{"Parental Questionnaire"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{, }\DataTypeTok{width =} \StringTok{"3cm"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{column_spec}\NormalTok{(}\DecValTok{4}\OperatorTok{:}\DecValTok{5}\NormalTok{, }\DataTypeTok{width =} \StringTok{"4cm"}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{kable_styling}\NormalTok{() }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{add_header_above}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{, }\StringTok{"From daylong recording"}\NormalTok{ =}\StringTok{ }\DecValTok{2}\NormalTok{, }\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{add_header_above}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{, }\StringTok{"From daylong recording"}\NormalTok{ =}\StringTok{ }\DecValTok{3}\NormalTok{, }\StringTok{" "}\NormalTok{ =}\StringTok{ }\DecValTok{1}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\NormalTok{kableExtra}\OperatorTok{::}\KeywordTok{kable_styling}\NormalTok{(}\DataTypeTok{latex_options =} \StringTok{"hold_position"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{table}[!h]
 
-\caption{(\#tab:make table for questionnaire method)Spanish language in child-directed speech 
+\caption{\label{tab:cds-by-span}Spanish language in child-directed speech 
  estimates in U.S. corpus, by child and estimation method.}
 \centering
-\begin{tabular}[t]{lrrl}
+\begin{tabular}[t]{>{\raggedright\arraybackslash}p{3cm}>{\raggedleft\arraybackslash}p{3cm}>{\raggedleft\arraybackslash}p{3cm}>{\raggedright\arraybackslash}p{4cm}>{\raggedright\arraybackslash}p{4cm}}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{2}{c}{From daylong recording} & \multicolumn{1}{c}{ } \\
-\cmidrule(l{3pt}r{3pt}){2-3}
-Child ID & Random & All-day & Parental Questionnaire\\
+\multicolumn{1}{c}{ } & \multicolumn{3}{c}{From daylong recording} & \multicolumn{1}{c}{ } \\
+\cmidrule(l{3pt}r{3pt}){2-4}
+Child ID & Random & All-day & n=100 simulations of random sampling & Parental Questionnaire\\
 \midrule
-179 & 0.53 & 0.52 & .71\\
-198-9mo & 0.78 & 0.64 & .57\\
-199 & 0.64 & 0.66 & .94\\
-261-8mo & 0.55 & 0.48 & .69\\
-267-12mo & 0.82 & 0.87 & .87\\
+179 & 0.53 & 0.52 & 0.52 ( 0.05 ) & .71\\
+198-9mo & 0.78 & 0.64 & 0.65 ( 0.07 ) & .57\\
+199 & 0.64 & 0.66 & 0.65 ( 0.07 ) & .94\\
+261-8mo & 0.55 & 0.48 & 0.48 ( 0.05 ) & .69\\
+267-12mo & 0.82 & 0.87 & 0.87 ( 0.04 ) & .87\\
 \bottomrule
 \end{tabular}
 \end{table}
