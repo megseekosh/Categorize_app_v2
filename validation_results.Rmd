@@ -123,9 +123,9 @@ data_avbl <- data3 %>%
   count() %>%
   rename(not_avl_clips = n) %>%
   merge(., data_annon, by=c('id', 'method')) %>%
-  mutate(avbl_clips = num_clips - not_avl_clips) %>% # clips that were *available* for annotation
+  mutate(avbl_clips = num_clips - not_avl_clips) %>% # clips that were *available* for annotation out of the total # of clips from the recording; it's the same for both methods because the # of available clips to draw is the same for both methods
   merge(., for_speech_clips, by=c('id', 'method')) %>% # N of unique clips annotated - NOT the # of annotations 
-  mutate(percen_avl_annon = (speech_clips / avbl_clips)*100) %>% # the % of available clips that were annotated
+  mutate(percen_avl_annon = (speech_clips / avbl_clips)*100) %>% # the # of clips annotated / # of avbl clips; % should be smaller for random
   distinct_at(., vars(id, method), .keep_all = T) %>%
   group_by(method) %>%
   mutate(avbl_clips = paste(speech_clips, "(",round(percen_avl_annon,2),"%)")) %>%
@@ -261,26 +261,30 @@ span_sim_results <- sim_lang_data %>%
 que_sim_stats <- que_sim_results %>%
   ungroup() %>%
   summarize(mean_sim_que = round(mean(percen_que),2),
-         sd_sim_que = round(sd(percen_que),2)) %>%
-  mutate(sim_stat = paste(mean_sim_que,"(",sd_sim_que,")")) %>%
+         sd_sim_que = round(sd(percen_que),2),
+         min_sim_que = round(range(percen_que)[1],2),
+         max_sim_que = round(range(percen_que)[2],2)) %>%
+  mutate(sim_stat = paste(mean_sim_que,"(",sd_sim_que,")",min_sim_que,"-",max_sim_que)) %>%
   select(sim_stat)
 
 span_sim_stats <- span_sim_results %>%
   ungroup() %>%
   summarize(mean_sim_span = round(mean(percen_span),2),
-         sd_sim_span = round(sd(percen_span),2)) %>%
-  mutate(sim_stat = paste(mean_sim_span,"(",sd_sim_span,")")) %>%
+         sd_sim_span = round(sd(percen_span),2),
+          min_sim_span = round(range(percen_span)[1],2),
+         max_sim_span = round(range(percen_span)[2],2)) %>%
+  mutate(sim_stat = paste(mean_sim_span,"(",sd_sim_span,")",min_sim_span,"-",max_sim_span)) %>%
   select(sim_stat)
 
 # now the spanish estimate by individual child in US corpus
 span_sim_child_stats <- span_sim_results %>%
   group_by(id) %>%
   summarize(mean_sim_span = round(mean(percen_span),2),
-         sd_sim_span = round(sd(percen_span),2)) %>%
-  mutate(sim_stat_child = paste(mean_sim_span,"(",sd_sim_span,")")) %>%
+         sd_sim_span = round(sd(percen_span),2),
+         min_sim_span = round(range(percen_span)[1],2),
+         max_sim_span = round(range(percen_span)[2],2)) %>%
+  mutate(sim_stat_child = paste(mean_sim_span,"(",sd_sim_span,")",min_sim_span,"-",max_sim_span)) %>%
   select(id, sim_stat_child)
-
-
 ```
 
 ```{r, compute ratios/percens}
@@ -382,8 +386,8 @@ lang_tbl <- rbind(us_lang_tbl2, bo_lang_tbl2)
 knitr::kable(lang_tbl, caption = 'Average minority language estimates by corpus and annotation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Corpus (language)", "Random", "All-day", "Avg. relative error (SD)", "n=100 simulations of random sampling", "Correlation between estimates")) %>% 
-  column_spec(1, width = "4cm") %>%
+             col.names = c("Corpus (language)", "Random", "All-day", "Avg. relative error (SD)", "n=100 simulations of random sampling Avg. (SD) Range", "Correlation between estimates")) %>% 
+  column_spec(1, width = "5.5cm") %>%
     column_spec(4, width = "3cm") %>%
   column_spec(5:6, width = "4cm") %>%
   kable_styling() %>%
@@ -538,6 +542,7 @@ o3$total <- o3$percen_ods + o3$percen_ads + o3$percen_cds
 ```
 
 ```{r, CDS simulations}
+set.seed(1234)
 # now simulate 100 CDS estimates from each child
 # take however many clips were used to compute the randomly-sampled estimate
 # then compute the prop. of those that are CDS
@@ -571,8 +576,10 @@ cds_sim_results <- sim_data %>%
 cds_sim_stats <- cds_sim_results %>%
   group_by(id) %>%
   summarize(mean_sim_cds = round(mean(percen_cds),2),
-         sd_sim_cds = round(sd(percen_cds),2)) %>%
-  mutate(sim_stat = paste(mean_sim_cds,"(",sd_sim_cds,")")) %>%
+         sd_sim_cds = round(sd(percen_cds),2),
+         min_sim_cds = round(range(percen_cds)[1],2),
+         max_sim_cds = round(range(percen_cds)[2],2)) %>%
+  mutate(sim_stat = paste(mean_sim_cds,"(",sd_sim_cds,")",min_sim_cds,"-",max_sim_cds)) %>%
   select(id, sim_stat)
 
 # now compute the ADS estimate
@@ -587,10 +594,75 @@ ads_sim_results <- sim_data %>%
 ads_sim_stats <- ads_sim_results %>%
   group_by(location) %>%
   summarize(mean_sim_ads = round(mean(percen_ads),2),
-         sd_sim_ads = round(sd(percen_ads),2)) %>%
-  mutate(sim_stat_ads = paste(mean_sim_ads,"(",sd_sim_ads,")")) %>%
+         sd_sim_ads = round(sd(percen_ads),2),
+         min_sim_ads = round(range(percen_ads)[1],2),
+         max_sim_ads = round(range(percen_ads)[2],2)) %>%
+  mutate(sim_stat_ads = paste(mean_sim_ads,"(",sd_sim_ads,")",min_sim_ads,"-",max_sim_ads)) %>%
   select(location, sim_stat_ads)
 ```
+
+```{r, simulation density plots}
+#cds alone
+cds_density <- o3 %>%
+  filter(method=='random') %>%
+  mutate(random_percencds_estimate=percen_cds) %>% # get the actual cds estimate from random sampling
+  select(id, random_percencds_estimate) %>%
+  merge(., cds_sim_results, by="id") %>%
+  mutate(id=recode(id,"198-9mo"="198","261-8mo"="261","267-12mo"="267")) %>%
+  ggplot(., aes(x=percen_cds)) +
+  geom_density(fill="antiquewhite", color='gray57',alpha=.75) +
+  facet_wrap(~id, scales="free") +
+  geom_vline(aes(xintercept=random_percencds_estimate),
+            color="chocolate2", linetype="dashed", size=1) +
+  xlab("Estimates of child-directed speech quantity") +
+  ylab("Density") +
+  theme(axis.text=element_text(size=8),
+      axis.title=element_text(size=17,face="bold"))
+cds_density
+
+jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/cds_density_plot.jpeg", height = 400, width = 700)
+cds_density
+dev.off()
+
+reg_density <- o3 %>%
+  filter(method=='random') %>%
+  mutate(random_percencds_estimate=percen_cds) %>% # get the actual cds estimate from random sampling
+  mutate(random_percenads_estimate=percen_ads) %>% # get the actual ads estimate from random sampling
+  select(id, random_percencds_estimate, random_percenads_estimate) %>%
+  merge(., cds_sim_results, by="id") %>%
+  select(id, random_percenads_estimate, random_percencds_estimate, percen_cds, simulation) %>%
+  merge(., ads_sim_results, by=c("simulation", "id")) %>%
+  group_by(id) %>%
+  mutate(avg_percen_cds = mean(percen_cds),
+         avg_percen_ads = mean(percen_ads)) %>%
+  ungroup() %>%
+  gather("Register", "estimate", percen_cds, percen_ads) %>%
+  mutate(Register=recode(Register, "percen_ads"='Adult-directed \n speech', "percen_cds"='Target child-directed \n speech')) %>%
+  mutate(id=recode(id,"198-9mo"="198","261-8mo"="261","267-12mo"="267")) %>%
+  ggplot(., aes(x=estimate, fill=Register)) +
+  geom_density(alpha=.75) +
+  scale_fill_manual(values=c("lightsalmon", "skyblue1")) +
+  facet_wrap(~id, scales = "free") +
+  geom_vline(aes(xintercept=random_percenads_estimate),
+            color="indianred3", linetype="dashed", size=.5) +
+    geom_vline(aes(xintercept=random_percencds_estimate),
+            color="dodgerblue3", linetype="dashed", size=.5) +
+    #geom_vline(aes(xintercept=avg_percen_ads),
+            #color="indianred3", linetype="solid", size=.5) +
+    #geom_vline(aes(xintercept=avg_percen_cds),
+            #color="dodgerblue3", linetype="solid", size=.5) +
+  xlab("Speech register estimates") +
+  ylab("Density") +
+  theme(axis.text=element_text(size=8),
+      axis.title=element_text(size=17,face="bold"),
+      legend.title = element_text(face="bold", size=15))
+reg_density
+
+jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/reg_density_plot.jpeg", height = 400, width = 700)
+reg_density
+dev.off()
+```
+
 
 ```{r, cds proportion stats}
 # for later
@@ -658,7 +730,7 @@ final_reg_tbl2 <- final_reg_tbl %>%
 knitr::kable(final_reg_tbl2, caption = 'Target child-directed speech estimates by child and annotation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Corpus (ID)", "Random", "All-day", "Relative error", "n=100 simulations of random sampling", "Within-corpus correlation between random and all-day estimates")) %>% # "
+             col.names = c("Corpus (ID)", "Random", "All-day", "Relative error", "n=100 simulations of random sampling Avg. (SD) Range", "Within-corpus correlation between random and all-day estimates")) %>% # "
   column_spec(1, width = "4cm") %>% # force column headers onto two rows
   column_spec(4, width = "3cm") %>%
   column_spec(5:6, width = "4cm") %>%
@@ -716,7 +788,7 @@ final_reg_tbl$location <-
 knitr::kable(final_reg_tbl, caption = 'Average adult-directed speech estimates by corpus and annotation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Corpus", "Random", "All-day", "Average relative error (SD)", "n=100 simulations of random sampling",  "Correlation between estimates")) %>% 
+             col.names = c("Corpus", "Random", "All-day", "Average relative error (SD)", "n=100 simulations of random sampling Avg. (SD) Range",  "Correlation between estimates")) %>% 
   column_spec(1, width = "3.5cm") %>%
   column_spec(4, width = "3cm") %>%
   column_spec(5:6, width = "4cm") %>%
@@ -818,7 +890,7 @@ ques_complete_cors <- ques_tbl %>%
 knitr::kable(ques_tbl, caption = 'Spanish language estimates in U.S. corpus, by child and estimation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Child ID", "Random", "All-day", "n=100 simulations of random sampling", "Parental Questionnaire")) %>% 
+             col.names = c("Child ID", "Random", "All-day", "n=100 simulations of random sampling Avg. (SD) Range", "Parental Questionnaire")) %>% 
   column_spec(4:5, width = "4cm") %>%
   kable_styling() %>%
   add_header_above(c(" " = 1, "From daylong recording" = 3, " " = 1)) %>%
@@ -879,8 +951,10 @@ cdsspan_sim_results <- cdsspan_sim_data %>%
 cdsspan_sim_stats <- cdsspan_sim_results %>%
   group_by(id) %>%
   summarize(mean_sim_cdsspan = round(mean(percen_cdsspan),2),
-            sd_sim_cdsspan = round(sd(percen_cdsspan),2)) %>%
-  mutate(sim_stat_cdsspan = paste(mean_sim_cdsspan,"(",sd_sim_cdsspan,")")) %>%
+            sd_sim_cdsspan = round(sd(percen_cdsspan),2),
+            min_sim_cdsspan = round(range(percen_cdsspan)[1],2),
+            max_sim_cdsspan = round(range(percen_cdsspan)[2],2)) %>%
+  mutate(sim_stat_cdsspan = paste(mean_sim_cdsspan,"(",sd_sim_cdsspan,")",min_sim_cdsspan,"-",max_sim_cdsspan)) %>%
   select(id, sim_stat_cdsspan)
 
 # now combine the simulated data with the span*cds table
@@ -893,7 +967,7 @@ span_cds_tbl2 <- span_cds_tbl %>%
 knitr::kable(span_cds_tbl2, caption = 'Spanish language in child-directed speech \n estimates in U.S. corpus, by child and estimation method.', 
              booktabs=T, 
              row.names = FALSE, 
-             col.names = c("Child ID", "Random", "All-day", "n=100 simulations of random sampling", "Parental Questionnaire")) %>% 
+             col.names = c("Child ID", "Random", "All-day", "n=100 simulations of random sampling Avg. (SD) Range", "Parental Questionnaire")) %>% 
   column_spec(1:3, width = "2cm") %>%
   column_spec(4:5, width = "4cm") %>%
   kable_styling() %>%
@@ -1002,7 +1076,7 @@ ggplot(., aes(annotation_num, roll_prop_cds)) +
   #geom_line(aes(y=rollapply(roll_prop_cds, 10, FUN=sd, fill=NA))) +
   geom_ribbon(aes(ymax=upper_ci, ymin=lower_ci), fill='lightblue', color='deepskyblue4') +  
     geom_line(aes(y=mean_ci), color='gray40', size=.8) + 
-  xlab("# of clips annotated") + 
+  xlab("# of annotations") + 
   ylab("CDS estimation and variance") + 
   facet_wrap(~id, scales = "free") +
   #title = 'Variance in child-directed estimation as a function of clips annotated') +
@@ -1079,7 +1153,7 @@ span_var_plot <- span_rolling2 %>%
 ggplot(., aes(annotation_num, roll_prop_span)) +
   geom_ribbon(aes(ymax=upper_ci, ymin=lower_ci), fill='lightblue', color='deepskyblue4') +
   geom_line(aes(y=mean_ci), color='gray40', size=.8) + 
-  xlab("# of clips annotated") + 
+  xlab("# of annotations") + 
   ylab("Spanish language estimation \n and variance") + 
   facet_wrap(~id, scales = "free") +
   #title = 'Variance in Spanish language estimation as a function of clips drawn: US corpus') +
@@ -1153,7 +1227,7 @@ que_var_plot <- que_rolling2 %>%
 ggplot(., aes(annotation_num, roll_prop_que)) +
   geom_ribbon(aes(ymax=upper_ci, ymin=lower_ci), fill='lightblue', color='deepskyblue4') +
   geom_line(aes(y=mean_ci), color='gray40', size=.8) + 
-  xlab("# of clips annotated") + 
+  xlab("# of annotations") + 
   ylab("Quechua language estimation \n and variance") + 
   facet_wrap(~id, scales = "free") +
   #title = 'Variance in Quechua language estimation as a function of clips drawn: Bolivia corpus') +
