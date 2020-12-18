@@ -113,16 +113,28 @@ for_speech_clips <- data_annon_cts %>%
   select(id, method, speech_clips) %>%
   distinct_at(., vars(id, method), .keep_all = T)
 
+# first load in the complete files so we can estimate the # of available clips
+all <- read.csv('/Users/megcychosz/Google Drive/biling_CDS/Meg_data/1032_config.csv')
+all2 <- read.csv('/Users/megcychosz/Google Drive/biling_CDS/Meg_data/1060_config.csv')
+all3 <- read.csv('/Users/megcychosz/Google Drive/biling_CDS/Meg_data/1075_config.csv')
+all4 <- read.csv('/Users/megcychosz/Google Drive/biling_CDS/Meg_data/1077_config.csv')
+all5 <- read.csv('/Users/megcychosz/Google Drive/biling_CDS/Meg_data/1081_config.csv')
+all6 <- read.csv('/Users/megcychosz/Google Drive/biling_CDS/Anele_data/179config.csv')
+all7 <- read.csv('/Users/megcychosz/Google Drive/biling_CDS/Anele_data/198config.csv')
+all8 <- read.csv('/Users/megcychosz/Google Drive/biling_CDS/Anele_data/199config.csv')
+all9 <- read.csv('/Users/megcychosz/Google Drive/biling_CDS/Anele_data/261config.csv')
+all10 <- read.csv('/Users/megcychosz/Google Drive/biling_CDS/Anele_data/267config.csv')
+config_files <- rbind(all, all2, all3, all4, all5, all6, all7, all8, all9, all10)
+
 # calculate the num and % of all clips available for annotation
-data_annon$Childsleep <- as.factor(data_annon$Childsleep)
-data_avbl <- data3 %>%
-  group_by(id, method) %>%
-  distinct(file_name, .keep_all = T) %>% # two, for random and complete
+data_avbl <- config_files %>%
+  group_by(id) %>%
+  distinct(file_name, .keep_all = T) %>% # duplicates bc drawn with replacement
   mutate(voc = if_else(percents_voc > 0, "1", "0")) %>% # turn percents_voc binary
   filter(sleeping=='1' | researcher_present == '1' | voc == '0') %>%
   count() %>%
   rename(not_avl_clips = n) %>%
-  merge(., data_annon, by=c('id', 'method')) %>%
+  merge(., data_annon, by=c('id')) %>%
   mutate(avbl_clips = num_clips - not_avl_clips) %>% # clips that were *available* for annotation out of the total # of clips from the recording; it's the same for both methods because the # of available clips to draw is the same for both methods
   merge(., for_speech_clips, by=c('id', 'method')) %>% # N of unique clips annotated - NOT the # of annotations 
   mutate(percen_avl_annon = (speech_clips / avbl_clips)*100) %>% # the # of clips annotated / # of avbl clips; % should be smaller for random

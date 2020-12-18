@@ -114,7 +114,7 @@
 
 \title{Validation results}
 \author{Meg Cychosz}
-\date{17 December 2020}
+\date{18 December 2020}
 
 \begin{document}
 \maketitle
@@ -167,16 +167,28 @@
 \StringTok{  }\KeywordTok{select}\NormalTok{(id, method, speech_clips) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{distinct_at}\NormalTok{(., }\KeywordTok{vars}\NormalTok{(id, method), }\DataTypeTok{.keep_all =}\NormalTok{ T)}
 
+\CommentTok{# first load in the complete files so we can estimate the # of available clips}
+\NormalTok{all <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'/Users/megcychosz/Google Drive/biling_CDS/Meg_data/1032_config.csv'}\NormalTok{)}
+\NormalTok{all2 <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'/Users/megcychosz/Google Drive/biling_CDS/Meg_data/1060_config.csv'}\NormalTok{)}
+\NormalTok{all3 <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'/Users/megcychosz/Google Drive/biling_CDS/Meg_data/1075_config.csv'}\NormalTok{)}
+\NormalTok{all4 <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'/Users/megcychosz/Google Drive/biling_CDS/Meg_data/1077_config.csv'}\NormalTok{)}
+\NormalTok{all5 <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'/Users/megcychosz/Google Drive/biling_CDS/Meg_data/1081_config.csv'}\NormalTok{)}
+\NormalTok{all6 <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'/Users/megcychosz/Google Drive/biling_CDS/Anele_data/179config.csv'}\NormalTok{)}
+\NormalTok{all7 <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'/Users/megcychosz/Google Drive/biling_CDS/Anele_data/198config.csv'}\NormalTok{)}
+\NormalTok{all8 <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'/Users/megcychosz/Google Drive/biling_CDS/Anele_data/199config.csv'}\NormalTok{)}
+\NormalTok{all9 <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'/Users/megcychosz/Google Drive/biling_CDS/Anele_data/261config.csv'}\NormalTok{)}
+\NormalTok{all10 <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'/Users/megcychosz/Google Drive/biling_CDS/Anele_data/267config.csv'}\NormalTok{)}
+\NormalTok{config_files <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(all, all2, all3, all4, all5, all6, all7, all8, all9, all10)}
+
 \CommentTok{# calculate the num and % of all clips available for annotation}
-\NormalTok{data_annon}\OperatorTok{$}\NormalTok{Childsleep <-}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(data_annon}\OperatorTok{$}\NormalTok{Childsleep)}
-\NormalTok{data_avbl <-}\StringTok{ }\NormalTok{data3 }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{group_by}\NormalTok{(id, method) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{distinct}\NormalTok{(file_name, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# two, for random and complete}
+\NormalTok{data_avbl <-}\StringTok{ }\NormalTok{config_files }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{distinct}\NormalTok{(file_name, }\DataTypeTok{.keep_all =}\NormalTok{ T) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# duplicates bc drawn with replacement}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{voc =} \KeywordTok{if_else}\NormalTok{(percents_voc }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{, }\StringTok{"1"}\NormalTok{, }\StringTok{"0"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# turn percents_voc binary}
 \StringTok{  }\KeywordTok{filter}\NormalTok{(sleeping}\OperatorTok{==}\StringTok{'1'} \OperatorTok{|}\StringTok{ }\NormalTok{researcher_present }\OperatorTok{==}\StringTok{ '1'} \OperatorTok{|}\StringTok{ }\NormalTok{voc }\OperatorTok{==}\StringTok{ '0'}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{count}\NormalTok{() }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{rename}\NormalTok{(}\DataTypeTok{not_avl_clips =}\NormalTok{ n) }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{merge}\NormalTok{(., data_annon, }\DataTypeTok{by=}\KeywordTok{c}\NormalTok{(}\StringTok{'id'}\NormalTok{, }\StringTok{'method'}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., data_annon, }\DataTypeTok{by=}\KeywordTok{c}\NormalTok{(}\StringTok{'id'}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{avbl_clips =}\NormalTok{ num_clips }\OperatorTok{-}\StringTok{ }\NormalTok{not_avl_clips) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# clips that were *available* for annotation out of the total # of clips from the recording; it's the same for both methods because the # of available clips to draw is the same for both methods}
 \StringTok{  }\KeywordTok{merge}\NormalTok{(., for_speech_clips, }\DataTypeTok{by=}\KeywordTok{c}\NormalTok{(}\StringTok{'id'}\NormalTok{, }\StringTok{'method'}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# N of unique clips annotated - NOT the # of annotations }
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{percen_avl_annon =}\NormalTok{ (speech_clips }\OperatorTok{/}\StringTok{ }\NormalTok{avbl_clips)}\OperatorTok{*}\DecValTok{100}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# the # of clips annotated / # of avbl clips; % should be smaller for random}
@@ -276,17 +288,17 @@ Quechua-Spanish (1032) & 97 ( 5.05 \%) & 372 ( 19.38 \%)\\
 \cmidrule(l{3pt}r{3pt}){2-3} \cmidrule(l{3pt}r{3pt}){4-5}
 Corpus (ID) & Random & Complete & Random & Complete\\
 \midrule
-Spanish-English (267) & 345 ( 17.97 \%) & 960 ( 50 \%) & 101 ( 5.8 \%) & 274 ( 20.4 \%)\\
-Spanish-English (261) & 290 ( 15.1 \%) & 960 ( 50 \%) & 92 ( 5.06 \%) & 294 ( 19.3 \%)\\
-Spanish-English (199) & 192 ( 10 \%) & 960 ( 50 \%) & 118 ( 6.36 \%) & 467 ( 30.83 \%)\\
-Spanish-English (198) & 284 ( 14.79 \%) & 960 ( 50 \%) & 81 ( 4.52 \%) & 302 ( 20.53 \%)\\
-Spanish-English (179) & 192 ( 10 \%) & 960 ( 50 \%) & 120 ( 6.36 \%) & 633 ( 37.04 \%)\\
+Spanish-English (267) & 345 ( 17.97 \%) & 960 ( 50 \%) & 101 ( 13.1 \%) & 274 ( 35.54 \%)\\
+Spanish-English (261) & 290 ( 15.1 \%) & 960 ( 50 \%) & 92 ( 8.18 \%) & 294 ( 26.13 \%)\\
+Spanish-English (199) & 192 ( 10 \%) & 960 ( 50 \%) & 118 ( 10.61 \%) & 467 ( 42 \%)\\
+Spanish-English (198) & 284 ( 14.79 \%) & 960 ( 50 \%) & 81 ( 7.96 \%) & 302 ( 29.67 \%)\\
+Spanish-English (179) & 192 ( 10 \%) & 960 ( 50 \%) & 120 ( 8.05 \%) & 633 ( 42.48 \%)\\
 \addlinespace
-Quechua-Spanish (1081) & 249 ( 20.31 \%) & 613 ( 50 \%) & 92 ( 8.16 \%) & 285 ( 30.19 \%)\\
-Quechua-Spanish (1077) & 137 ( 11.93 \%) & 574 ( 50 \%) & 83 ( 7.33 \%) & 355 ( 32.75 \%)\\
-Quechua-Spanish (1075) & 267 ( 28.65 \%) & 466 ( 50 \%) & 81 ( 9.68 \%) & 199 ( 26.36 \%)\\
-Quechua-Spanish (1060) & 154 ( 14.58 \%) & 528 ( 50 \%) & 111 ( 10.65 \%) & 405 ( 40.87 \%)\\
-Quechua-Spanish (1032) & 263 ( 13.7 \%) & 960 ( 50 \%) & 97 ( 5.38 \%) & 372 ( 25.89 \%)\\
+Quechua-Spanish (1081) & 249 ( 20.31 \%) & 613 ( 50 \%) & 92 ( 13.83 \%) & 285 ( 42.86 \%)\\
+Quechua-Spanish (1077) & 137 ( 11.93 \%) & 574 ( 50 \%) & 83 ( 8.15 \%) & 355 ( 34.84 \%)\\
+Quechua-Spanish (1075) & 267 ( 28.65 \%) & 466 ( 50 \%) & 81 ( 14.21 \%) & 199 ( 34.91 \%)\\
+Quechua-Spanish (1060) & 154 ( 14.58 \%) & 528 ( 50 \%) & 111 ( 12.01 \%) & 405 ( 43.83 \%)\\
+Quechua-Spanish (1032) & 263 ( 13.7 \%) & 960 ( 50 \%) & 97 ( 10.16 \%) & 372 ( 38.95 \%)\\
 \bottomrule
 \end{tabular}
 
@@ -532,8 +544,8 @@ Quechua-Spanish (1032) & 263 ( 13.7 \%) & 960 ( 50 \%) & 97 ( 5.38 \%) & 372 ( 2
 \cmidrule(l{3pt}r{3pt}){2-3}
 Corpus (language) & Random & All-day & Avg. relative error (SD) & n=100 simulations of random sampling Avg. (SD) Range & Correlation between estimates\\
 \midrule
-Spanish-English (Spanish) & 0.75 ( 0.13 ) & 0.69 ( 0.12 ) & 5.36 ( 4.82 ) & 0.72 ( 0.13 ) 0.47 - 0.97 & r= 0.96 , p= 0.01\\
-Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & 11.02 ( 4.28 ) & 0.48 ( 0.13 ) 0.22 - 0.74 & r= 0.9 , p= 0.04\\
+Spanish-English (Spanish) & 0.75 ( 0.13 ) & 0.69 ( 0.12 ) & 5.36 ( 4.82 ) & 0.73 ( 0.13 ) 0.46 - 0.98 & r= 0.96 , p= 0.01\\
+Quechua-Spanish (Quechua) & 0.48 ( 0.11 ) & 0.5 ( 0.12 ) & 11.02 ( 4.28 ) & 0.48 ( 0.13 ) 0.22 - 0.75 & r= 0.9 , p= 0.04\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1188,11 +1200,11 @@ Spanish-English & 0.27 ( 0.2 ) & 0.27 ( 0.17 ) & 17.57 ( 12.74 ) & 0.27 ( 0.16 )
 \cmidrule(l{3pt}r{3pt}){2-4}
 Child ID & Random & All-day & n=100 simulations of random sampling Avg. (SD) Range & Parental Questionnaire\\
 \midrule
-179 & 0.57 & 0.57 & 0.56 ( 0.04 ) 0.47 - 0.7 & .71\\
-198-9mo & 0.87 & 0.78 & 0.77 ( 0.05 ) 0.66 - 0.89 & .57\\
-199 & 0.76 & 0.70 & 0.7 ( 0.03 ) 0.6 - 0.79 & .94\\
-261-8mo & 0.69 & 0.65 & 0.65 ( 0.04 ) 0.56 - 0.75 & .69\\
-267-12mo & 0.92 & 0.92 & 0.92 ( 0.02 ) 0.86 - 0.97 & .87\\
+179 & 0.57 & 0.57 & 0.57 ( 0.04 ) 0.46 - 0.67 & .71\\
+198-9mo & 0.87 & 0.78 & 0.79 ( 0.04 ) 0.65 - 0.89 & .57\\
+199 & 0.76 & 0.70 & 0.71 ( 0.03 ) 0.63 - 0.78 & .94\\
+261-8mo & 0.69 & 0.65 & 0.65 ( 0.05 ) 0.54 - 0.75 & .69\\
+267-12mo & 0.92 & 0.92 & 0.92 ( 0.02 ) 0.88 - 0.98 & .87\\
 \bottomrule
 \end{tabular}
 \end{table}
