@@ -101,9 +101,13 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/name_prompt.png "name_prompt")
 	
-	The main interactive window will appear, which can be easily modified in the source code according to your annotation goals. In the current example, the following window is displayed:
+	The main interactive window will appear, which can be easily modified in the source code according to your annotation goals. For example, in `2_categorize_app_biling.py`, the following window is displayed: 
 	
 	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/annotation_window.png "annotation_window")
+	
+	And in `2_categorize_app_CDS.py` the following window is displayed:
+	
+	![alt text](https://github.com/megseekosh/Categorize_app_v2/blob/master/annotation_window2.png "annotation_window2")
 	
 	Press "Play." Various metadata details will display in the command line. After the clip, make your selection from the menus and hit "Next" or "Repeat". You can repeat as many times as you would like. To play the next clip in your current annotation session, always press "Next." 
 	
