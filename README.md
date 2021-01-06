@@ -131,7 +131,7 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 
 ## Research Output
-  `Cychosz_Villanueva_Weisleder_paper.pdf' - manuscript 
+  `Cychosz_Villanueva_Weisleder_paper.pdf` - manuscript 
   
   `Cychosz_Villanueva_Weisleder_poster.pdf` - poster from recent Many Paths to Language Acquisition Conference demosntrating the validity of the random sampling approach
   
