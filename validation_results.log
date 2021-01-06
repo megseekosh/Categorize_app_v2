@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  30 DEC 2020 14:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  6 JAN 2021 07:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -813,14 +813,17 @@ File: validation_results_files/figure-latex/unnamed-chunk-2-1.pdf Graphic file
 Package pdftex.def Info: validation_results_files/figure-latex/unnamed-chunk-2-
 1.pdf  used on input line 1311.
 (pdftex.def)             Requested size: 454.70456pt x 312.17024pt.
-[24 <./validation_results_files/figure-latex/unnamed-chunk-2-1.pdf>] [25pdfTeX 
-warning (ext4): destination with the same identifier (name{table.4}) has been a
-lready used, duplicate ignored
+[24 <./validation_results_files/figure-latex/unnamed-chunk-2-1.pdf>]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[25] [26pdfTeX warning (ext4): destination with the same identifier (name{table
+.4}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1409 \end{Shaded}
-                   ] [26]
+l.1508 \end{Shaded}
+                   ]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
@@ -831,21 +834,21 @@ File: validation_results_files/figure-latex/questionnaire plot-1.pdf Graphic fi
 le (type pdf)
 <use validation_results_files/figure-latex/questionnaire plot-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/questionnaire pl
-ot-1.pdf  used on input line 1557.
+ot-1.pdf  used on input line 1566.
 (pdftex.def)             Requested size: 452.69014pt x 315.17673pt.
 [28pdfTeX warning (ext4): destination with the same identifier (name{table.5}) 
 has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1559 \begin{Shaded}
+l.1568 \begin{Shaded}
                      ] [29 <./validation_results_files/figure-latex/questionnai
 re plot-1.pdf>]
-Underfull \vbox (badness 10000) detected at line 1660
+Underfull \vbox (badness 10000) detected at line 1669
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1660
+Underfull \vbox (badness 10000) detected at line 1669
  []
 
 [30]
@@ -855,7 +858,7 @@ File: validation_results_files/figure-latex/plot rolling CDS variances-1.pdf Gr
 aphic file (type pdf)
 <use validation_results_files/figure-latex/plot rolling CDS variances-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/plot rolling CDS
- variances-1.pdf  used on input line 1686.
+ variances-1.pdf  used on input line 1695.
 (pdftex.def)             Requested size: 461.72388pt x 316.18047pt.
 [31] [32 <./validation_results_files/figure-latex/plot rolling CDS variances-1.
 pdf>]
@@ -866,7 +869,7 @@ US-1.pdf Graphic file (type pdf)
 <use validation_results_files/figure-latex/plot rolling Spanish variances for U
 S-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/plot rolling Spa
-nish variances for US-1.pdf  used on input line 1763.
+nish variances for US-1.pdf  used on input line 1772.
 (pdftex.def)             Requested size: 459.74442pt x 316.19975pt.
 [33] [34 <./validation_results_files/figure-latex/plot rolling Spanish variance
 s for US-1.pdf>]
@@ -877,39 +880,35 @@ Bolivia-1.pdf Graphic file (type pdf)
 <use validation_results_files/figure-latex/plot rolling Quechua variances for B
 olivia-1.pdf>
 Package pdftex.def Info: validation_results_files/figure-latex/plot rolling Que
-chua variances for Bolivia-1.pdf  used on input line 1826.
+chua variances for Bolivia-1.pdf  used on input line 1835.
 (pdftex.def)             Requested size: 459.74442pt x 316.19975pt.
 [35 <./validation_results_files/figure-latex/plot rolling Quechua variances for
  Bolivia-1.pdf>]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[36]
-Underfull \vbox (badness 2582) detected at line 2028
- []
-
-[37pdfTeX warning (ext4): destination with the same identifier (name{table.6}) 
-has been already used, duplicate ignored
+[36] [37pdfTeX warning (ext4): destination with the same identifier (name{table
+.6}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.2028 \end{Shaded}
-                   ]
-Underfull \vbox (badness 10000) detected at line 2028
+l.1969 \begin{Shaded}
+                     ]
+Underfull \vbox (badness 10000) detected at line 2066
  []
 
 
-Underfull \vbox (badness 10000) detected at line 2028
+Underfull \vbox (badness 10000) detected at line 2066
  []
 
 [38]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2030.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2068.
 [39]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2030.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2068.
 (./validation_results.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2030.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 2030.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2030.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2068.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 2068.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2068.
  ) 
 Here is how much of TeX's memory you used:
  15037 strings out of 480608
@@ -927,7 +926,7 @@ texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2020/texmf-dist
 /lmr17.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmtk10.pfb
 ></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/loc
 al/texlive/2020/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on validation_results.pdf (39 pages, 508713 bytes).
+Output written on validation_results.pdf (39 pages, 509635 bytes).
 PDF statistics:
  388 PDF objects out of 1000 (max. 8388607)
  297 compressed objects within 3 object streams

@@ -1042,10 +1042,19 @@ ques_tbl <- plot_data %>%
   relocate(id, random, complete, sim_stat_child)
 
 # compute correlations
-ques_random_cors <- ques_tbl %>%
+ques_random_cors <- ques_tbl %>% # random sampling
+  mutate(ques_est = as.numeric(ques_est)) %>%
+  summarize(., paste("r=",round(cor.test(ques_est, random)$estimate,3),",","p=",round(cor.test(ques_est, random)$p.value,3)))
+ques_complete_cors <- ques_tbl %>% # all-day sampling
+  mutate(ques_est = as.numeric(ques_est)) %>%
+  summarize(., paste("r=",round(cor.test(ques_est, complete)$estimate,2),",","p=",round(cor.test(ques_est, complete)$p.value,2)))
+
+ques_random_cors_4 <- ques_tbl %>% # random sampling excluding participant 179 who completed at 28 months
+  filter(id!='179') %>%
   mutate(ques_est = as.numeric(ques_est)) %>%
   summarize(., paste("r=",round(cor.test(ques_est, random)$estimate,2),",","p=",round(cor.test(ques_est, random)$p.value,2)))
-ques_complete_cors <- ques_tbl %>%
+ques_complete_cors_4 <- ques_tbl %>% # all-day sampling excluding participant 179 who completed at 28 months
+  filter(id!='179') %>%
   mutate(ques_est = as.numeric(ques_est)) %>%
   summarize(., paste("r=",round(cor.test(ques_est, complete)$estimate,2),",","p=",round(cor.test(ques_est, complete)$p.value,2)))
 
@@ -1460,28 +1469,31 @@ cds_model_data_thirdthird <- cds_rolling2 %>%
   mutate(halfrow = as.numeric(n()/2)) %>% # for a sanity check
   filter(row_number() >= n()*.66) # get the top 50% of rows from each group
 
-#cds_model_data_full <- cds_rolling_complete2 %>% # all the data from the 'complete' annotation
-#  group_by(id) %>%
-#  arrange(annotation_num)
+cds_model_data_full <- cds_rolling_complete2 %>% # all the data from the 'complete' annotation
+  group_by(id) %>%
+  arrange(annotation_num)
 
 # fit models  
 cds_model_firstthird <- cds_model_data_firstthird %>%
   #filter(roll_sd_cds!='NA') %>%
-  filter(location=='US') %>%
   mutate(ci_range = cis$upper - cis$lower) %>% 
   lmer(ci_range~annotation_num + (1|id), data = .) %>%
   summary()
 
 cds_model_secondthird <- cds_model_data_secondthird %>%
   #filter(roll_sd_cds!='NA') %>%
-  filter(location=='US') %>%
   mutate(ci_range = cis$upper - cis$lower) %>% 
   lmer(ci_range~annotation_num + (1|id), data = .) %>%
   summary()
 
 cds_model_thirdthird <- cds_model_data_thirdthird %>%
   #filter(roll_sd_cds!='NA') %>%
-  filter(location=='US') %>%
+  mutate(ci_range = cis$upper - cis$lower) %>% 
+  lmer(ci_range~annotation_num + (1|id), data = .) %>%
+  summary()
+
+cds_model_complete <- cds_model_data_full %>%
+  #filter(roll_sd_cds!='NA') %>%
   mutate(ci_range = cis$upper - cis$lower) %>% 
   lmer(ci_range~annotation_num + (1|id), data = .) %>%
   summary()
@@ -1513,7 +1525,27 @@ span_rolling_all2 <- span_rolling_all %>%
 
 
 # now start all over to get running variance for complete data from Bolivia and US
-# current not doing this as we're not fitting models to the 'complete' dataset
+span_rolling_all_complete <- lang_annon %>%
+  filter(method=='complete') %>%
+  group_by(id) %>% 
+  arrange(file_name) %>%
+  mutate(annotation_num = as.numeric(1:n())) %>%
+  group_by(id) %>%
+  arrange(annotation_num) %>%
+  mutate(span_cts=recode(language, "Unsure"="0", "English/Quechua"="0", "Mixed"="0", "Spanish"="1")) %>%
+  mutate(span_cts = as.numeric(span_cts)) %>%
+  mutate(span_running_cts = as.numeric(cumsum(span_cts))) %>%
+  mutate(roll_prop_span = span_running_cts / annotation_num,
+         roll_mean_span = rollmean(roll_prop_span, k=10, fill = NA),
+         roll_sd_span = rollapply(roll_prop_span, width=10, FUN=sd, fill=NA)) 
+
+# running binomial confidence interval (wilson)
+span_rolling_all_complete2 <- span_rolling_all_complete %>%
+  group_by(id, annotation_num) %>% # group by id and sample size
+  arrange(annotation_num) %>%
+  summarize(cis = binom.confint(span_running_cts, annotation_num, methods = 'wilson', conf.level = .95)) %>%
+  merge(., span_rolling_all_complete, by = c('id', 'annotation_num')) 
+
 
 # fit the spanish models
 # make the datasets
@@ -1535,9 +1567,9 @@ span_model_data_secondthird <- span_rolling_all2 %>%
   mutate(halfrow = as.numeric(n()/2)) %>% # for a sanity check
   filter(row_number() >= n()*.66)
 
-#span_model_data_full <- span_rolling_complete2 %>% # Bolivia & US; all the data from the 'all-day' annotation
-#  group_by(id) %>%
-#  arrange(annotation_num)
+span_model_data_complete <- span_rolling_all_complete2 %>% # Bolivia & US; all the data from the 'all-day' annotation
+  group_by(id) %>%
+  arrange(annotation_num)
 
 # fit the models
 span_model_firstthird <- span_model_data_firstthird %>%
@@ -1553,6 +1585,12 @@ span_model_secondthird <- span_model_data_secondthird %>%
   summary()
 
 span_model_thirdthird <- span_model_data_thirdthird %>%
+  #filter(roll_sd_span!='NA') %>%
+  mutate(ci_range = cis$upper - cis$lower) %>% # get the variance
+  lmer(ci_range~annotation_num + (1|id), data = .) %>%
+  summary()
+
+span_model_complete<- span_model_data_complete %>%
   #filter(roll_sd_span!='NA') %>%
   mutate(ci_range = cis$upper - cis$lower) %>% # get the variance
   lmer(ci_range~annotation_num + (1|id), data = .) %>%

@@ -114,7 +114,7 @@
 
 \title{Validation results}
 \author{Meg Cychosz}
-\date{30 December 2020}
+\date{06 January 2021}
 
 \begin{document}
 \maketitle
@@ -650,17 +650,17 @@ Quechua-Spanish (1032) & 263 ( 13.7 \%) & 960 ( 50 \%) & 97 ( 10.16 \%) & 372 ( 
 \cmidrule(l{3pt}r{3pt}){2-3}
 Corpus (ID) & Random & All-day & Absolute error & n=100 simulations of random sampling Avg. (SD) Range & Within-corpus correlation between random and all-day estimates\\
 \midrule
-Spanish-English (179) & 0.57 & 0.57 & 0.00 & 0.56 ( 0.04 ) 0.49 - 0.66 & r= 0.96 , p= 0.01\\
-Spanish-English (198) & 0.87 & 0.78 & 0.09 & 0.78 ( 0.04 ) 0.68 - 0.89 & r= 0.96 , p= 0.01\\
-Spanish-English (199) & 0.76 & 0.70 & 0.06 & 0.7 ( 0.04 ) 0.6 - 0.8 & r= 0.96 , p= 0.01\\
-Spanish-English (261) & 0.69 & 0.65 & 0.04 & 0.66 ( 0.04 ) 0.55 - 0.75 & r= 0.96 , p= 0.01\\
-Spanish-English (267) & 0.92 & 0.92 & 0.00 & 0.93 ( 0.02 ) 0.88 - 0.97 & r= 0.96 , p= 0.01\\
+Spanish-English (179) & 0.57 & 0.57 & 0.00 & 0.57 ( 0.03 ) 0.5 - 0.64 & r= 0.96 , p= 0.01\\
+Spanish-English (198) & 0.87 & 0.78 & 0.09 & 0.78 ( 0.04 ) 0.65 - 0.89 & r= 0.96 , p= 0.01\\
+Spanish-English (199) & 0.76 & 0.70 & 0.06 & 0.7 ( 0.04 ) 0.6 - 0.79 & r= 0.96 , p= 0.01\\
+Spanish-English (261) & 0.69 & 0.65 & 0.04 & 0.65 ( 0.05 ) 0.55 - 0.76 & r= 0.96 , p= 0.01\\
+Spanish-English (267) & 0.92 & 0.92 & 0.00 & 0.92 ( 0.02 ) 0.86 - 0.97 & r= 0.96 , p= 0.01\\
 \addlinespace
-Quechua-Spanish ( 1032 ) & 0.59 & 0.64 & 0.05 & 0.64 ( 0.05 ) 0.52 - 0.75 & r= 0.9 , p= 0.04\\
-Quechua-Spanish ( 1060 ) & 0.55 & 0.61 & 0.06 & 0.61 ( 0.04 ) 0.52 - 0.7 & r= 0.9 , p= 0.04\\
-Quechua-Spanish ( 1075 ) & 0.51 & 0.43 & 0.08 & 0.43 ( 0.05 ) 0.29 - 0.56 & r= 0.9 , p= 0.04\\
-Quechua-Spanish ( 1077 ) & 0.44 & 0.41 & 0.03 & 0.41 ( 0.05 ) 0.3 - 0.52 & r= 0.9 , p= 0.04\\
-Quechua-Spanish ( 1081 ) & 0.29 & 0.32 & 0.03 & 0.33 ( 0.05 ) 0.17 - 0.43 & r= 0.9 , p= 0.04\\
+Quechua-Spanish ( 1032 ) & 0.59 & 0.64 & 0.05 & 0.63 ( 0.04 ) 0.5 - 0.72 & r= 0.9 , p= 0.04\\
+Quechua-Spanish ( 1060 ) & 0.55 & 0.61 & 0.06 & 0.61 ( 0.04 ) 0.52 - 0.71 & r= 0.9 , p= 0.04\\
+Quechua-Spanish ( 1075 ) & 0.51 & 0.43 & 0.08 & 0.43 ( 0.05 ) 0.25 - 0.53 & r= 0.9 , p= 0.04\\
+Quechua-Spanish ( 1077 ) & 0.44 & 0.41 & 0.03 & 0.41 ( 0.04 ) 0.29 - 0.51 & r= 0.9 , p= 0.04\\
+Quechua-Spanish ( 1081 ) & 0.29 & 0.32 & 0.03 & 0.32 ( 0.05 ) 0.19 - 0.45 & r= 0.9 , p= 0.04\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1343,10 +1343,19 @@ Spanish-English & 0.27 ( 0.2 ) & 0.27 ( 0.17 ) & 0.04 ( 0.04 ) & 0.27 ( 0.16 ) 0
 \StringTok{  }\KeywordTok{relocate}\NormalTok{(id, random, complete, sim_stat_child)}
 
 \CommentTok{# compute correlations}
-\NormalTok{ques_random_cors <-}\StringTok{ }\NormalTok{ques_tbl }\OperatorTok{%>%}
+\NormalTok{ques_random_cors <-}\StringTok{ }\NormalTok{ques_tbl }\OperatorTok{%>%}\StringTok{ }\CommentTok{# random sampling}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ques_est =} \KeywordTok{as.numeric}\NormalTok{(ques_est)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(., }\KeywordTok{paste}\NormalTok{(}\StringTok{"r="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(ques_est, random)}\OperatorTok{$}\NormalTok{estimate,}\DecValTok{3}\NormalTok{),}\StringTok{","}\NormalTok{,}\StringTok{"p="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(ques_est, random)}\OperatorTok{$}\NormalTok{p.value,}\DecValTok{3}\NormalTok{)))}
+\NormalTok{ques_complete_cors <-}\StringTok{ }\NormalTok{ques_tbl }\OperatorTok{%>%}\StringTok{ }\CommentTok{# all-day sampling}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ques_est =} \KeywordTok{as.numeric}\NormalTok{(ques_est)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(., }\KeywordTok{paste}\NormalTok{(}\StringTok{"r="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(ques_est, complete)}\OperatorTok{$}\NormalTok{estimate,}\DecValTok{2}\NormalTok{),}\StringTok{","}\NormalTok{,}\StringTok{"p="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(ques_est, complete)}\OperatorTok{$}\NormalTok{p.value,}\DecValTok{2}\NormalTok{)))}
+
+\NormalTok{ques_random_cors_}\DecValTok{4}\NormalTok{ <-}\StringTok{ }\NormalTok{ques_tbl }\OperatorTok{%>%}\StringTok{ }\CommentTok{# random sampling excluding participant 179 who completed at 28 months}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(id}\OperatorTok{!=}\StringTok{'179'}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ques_est =} \KeywordTok{as.numeric}\NormalTok{(ques_est)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{summarize}\NormalTok{(., }\KeywordTok{paste}\NormalTok{(}\StringTok{"r="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(ques_est, random)}\OperatorTok{$}\NormalTok{estimate,}\DecValTok{2}\NormalTok{),}\StringTok{","}\NormalTok{,}\StringTok{"p="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(ques_est, random)}\OperatorTok{$}\NormalTok{p.value,}\DecValTok{2}\NormalTok{)))}
-\NormalTok{ques_complete_cors <-}\StringTok{ }\NormalTok{ques_tbl }\OperatorTok{%>%}
+\NormalTok{ques_complete_cors_}\DecValTok{4}\NormalTok{ <-}\StringTok{ }\NormalTok{ques_tbl }\OperatorTok{%>%}\StringTok{ }\CommentTok{# all-day sampling excluding participant 179 who completed at 28 months}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(id}\OperatorTok{!=}\StringTok{'179'}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ques_est =} \KeywordTok{as.numeric}\NormalTok{(ques_est)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{summarize}\NormalTok{(., }\KeywordTok{paste}\NormalTok{(}\StringTok{"r="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(ques_est, complete)}\OperatorTok{$}\NormalTok{estimate,}\DecValTok{2}\NormalTok{),}\StringTok{","}\NormalTok{,}\StringTok{"p="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{cor.test}\NormalTok{(ques_est, complete)}\OperatorTok{$}\NormalTok{p.value,}\DecValTok{2}\NormalTok{)))}
 
@@ -1372,11 +1381,11 @@ Spanish-English & 0.27 ( 0.2 ) & 0.27 ( 0.17 ) & 0.04 ( 0.04 ) & 0.27 ( 0.16 ) 0
 \cmidrule(l{3pt}r{3pt}){2-4}
 Child ID & Random & All-day & n=100 simulations of random sampling Avg. (SD) Range & Parental Questionnaire\\
 \midrule
-179 & 0.57 & 0.57 & 0.56 ( 0.04 ) 0.49 - 0.66 & .74\\
-198-9mo & 0.87 & 0.78 & 0.78 ( 0.04 ) 0.68 - 0.89 & .55\\
-199 & 0.76 & 0.70 & 0.7 ( 0.04 ) 0.6 - 0.8 & .95\\
-261-8mo & 0.69 & 0.65 & 0.66 ( 0.04 ) 0.55 - 0.75 & .73\\
-267-12mo & 0.92 & 0.92 & 0.93 ( 0.02 ) 0.88 - 0.97 & .87\\
+179 & 0.57 & 0.57 & 0.57 ( 0.03 ) 0.5 - 0.64 & .74\\
+198-9mo & 0.87 & 0.78 & 0.78 ( 0.04 ) 0.65 - 0.89 & .55\\
+199 & 0.76 & 0.70 & 0.7 ( 0.04 ) 0.6 - 0.79 & .95\\
+261-8mo & 0.69 & 0.65 & 0.65 ( 0.05 ) 0.55 - 0.76 & .73\\
+267-12mo & 0.92 & 0.92 & 0.92 ( 0.02 ) 0.86 - 0.97 & .87\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1926,28 +1935,31 @@ Child ID & 80-clip & Cut-off & 80-clip & Cut-off\\
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{halfrow =} \KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{n}\NormalTok{()}\OperatorTok{/}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# for a sanity check}
 \StringTok{  }\KeywordTok{filter}\NormalTok{(}\KeywordTok{row_number}\NormalTok{() }\OperatorTok{>=}\StringTok{ }\KeywordTok{n}\NormalTok{()}\OperatorTok{*}\NormalTok{.}\DecValTok{66}\NormalTok{) }\CommentTok{# get the top 50% of rows from each group}
 
-\CommentTok{#cds_model_data_full <- cds_rolling_complete2 %>% # all the data from the 'complete' annotation}
-\CommentTok{#  group_by(id) %>%}
-\CommentTok{#  arrange(annotation_num)}
+\NormalTok{cds_model_data_full <-}\StringTok{ }\NormalTok{cds_rolling_complete2 }\OperatorTok{%>%}\StringTok{ }\CommentTok{# all the data from the 'complete' annotation}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(annotation_num)}
 
 \CommentTok{# fit models  }
 \NormalTok{cds_model_firstthird <-}\StringTok{ }\NormalTok{cds_model_data_firstthird }\OperatorTok{%>%}
 \StringTok{  }\CommentTok{#filter(roll_sd_cds!='NA') %>%}
-\StringTok{  }\KeywordTok{filter}\NormalTok{(location}\OperatorTok{==}\StringTok{'US'}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ci_range =}\NormalTok{ cis}\OperatorTok{$}\NormalTok{upper }\OperatorTok{-}\StringTok{ }\NormalTok{cis}\OperatorTok{$}\NormalTok{lower) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{lmer}\NormalTok{(ci_range}\OperatorTok{~}\NormalTok{annotation_num }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{|}\NormalTok{id), }\DataTypeTok{data =}\NormalTok{ .) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{summary}\NormalTok{()}
 
 \NormalTok{cds_model_secondthird <-}\StringTok{ }\NormalTok{cds_model_data_secondthird }\OperatorTok{%>%}
 \StringTok{  }\CommentTok{#filter(roll_sd_cds!='NA') %>%}
-\StringTok{  }\KeywordTok{filter}\NormalTok{(location}\OperatorTok{==}\StringTok{'US'}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ci_range =}\NormalTok{ cis}\OperatorTok{$}\NormalTok{upper }\OperatorTok{-}\StringTok{ }\NormalTok{cis}\OperatorTok{$}\NormalTok{lower) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{lmer}\NormalTok{(ci_range}\OperatorTok{~}\NormalTok{annotation_num }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{|}\NormalTok{id), }\DataTypeTok{data =}\NormalTok{ .) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{summary}\NormalTok{()}
 
 \NormalTok{cds_model_thirdthird <-}\StringTok{ }\NormalTok{cds_model_data_thirdthird }\OperatorTok{%>%}
 \StringTok{  }\CommentTok{#filter(roll_sd_cds!='NA') %>%}
-\StringTok{  }\KeywordTok{filter}\NormalTok{(location}\OperatorTok{==}\StringTok{'US'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ci_range =}\NormalTok{ cis}\OperatorTok{$}\NormalTok{upper }\OperatorTok{-}\StringTok{ }\NormalTok{cis}\OperatorTok{$}\NormalTok{lower) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{lmer}\NormalTok{(ci_range}\OperatorTok{~}\NormalTok{annotation_num }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{|}\NormalTok{id), }\DataTypeTok{data =}\NormalTok{ .) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summary}\NormalTok{()}
+
+\NormalTok{cds_model_complete <-}\StringTok{ }\NormalTok{cds_model_data_full }\OperatorTok{%>%}
+\StringTok{  }\CommentTok{#filter(roll_sd_cds!='NA') %>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ci_range =}\NormalTok{ cis}\OperatorTok{$}\NormalTok{upper }\OperatorTok{-}\StringTok{ }\NormalTok{cis}\OperatorTok{$}\NormalTok{lower) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{lmer}\NormalTok{(ci_range}\OperatorTok{~}\NormalTok{annotation_num }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{|}\NormalTok{id), }\DataTypeTok{data =}\NormalTok{ .) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{summary}\NormalTok{()}
@@ -1980,7 +1992,27 @@ Child ID & 80-clip & Cut-off & 80-clip & Cut-off\\
 
 
 \CommentTok{# now start all over to get running variance for complete data from Bolivia and US}
-\CommentTok{# current not doing this as we're not fitting models to the 'complete' dataset}
+\NormalTok{span_rolling_all_complete <-}\StringTok{ }\NormalTok{lang_annon }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{filter}\NormalTok{(method}\OperatorTok{==}\StringTok{'complete'}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(file_name) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{annotation_num =} \KeywordTok{as.numeric}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\KeywordTok{n}\NormalTok{())) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(annotation_num) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{span_cts=}\KeywordTok{recode}\NormalTok{(language, }\StringTok{"Unsure"}\NormalTok{=}\StringTok{"0"}\NormalTok{, }\StringTok{"English/Quechua"}\NormalTok{=}\StringTok{"0"}\NormalTok{, }\StringTok{"Mixed"}\NormalTok{=}\StringTok{"0"}\NormalTok{, }\StringTok{"Spanish"}\NormalTok{=}\StringTok{"1"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{span_cts =} \KeywordTok{as.numeric}\NormalTok{(span_cts)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{span_running_cts =} \KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{cumsum}\NormalTok{(span_cts))) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{roll_prop_span =}\NormalTok{ span_running_cts }\OperatorTok{/}\StringTok{ }\NormalTok{annotation_num,}
+         \DataTypeTok{roll_mean_span =} \KeywordTok{rollmean}\NormalTok{(roll_prop_span, }\DataTypeTok{k=}\DecValTok{10}\NormalTok{, }\DataTypeTok{fill =} \OtherTok{NA}\NormalTok{),}
+         \DataTypeTok{roll_sd_span =} \KeywordTok{rollapply}\NormalTok{(roll_prop_span, }\DataTypeTok{width=}\DecValTok{10}\NormalTok{, }\DataTypeTok{FUN=}\NormalTok{sd, }\DataTypeTok{fill=}\OtherTok{NA}\NormalTok{)) }
+
+\CommentTok{# running binomial confidence interval (wilson)}
+\NormalTok{span_rolling_all_complete2 <-}\StringTok{ }\NormalTok{span_rolling_all_complete }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id, annotation_num) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# group by id and sample size}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(annotation_num) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{cis =} \KeywordTok{binom.confint}\NormalTok{(span_running_cts, annotation_num, }\DataTypeTok{methods =} \StringTok{'wilson'}\NormalTok{, }\DataTypeTok{conf.level =} \FloatTok{.95}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{merge}\NormalTok{(., span_rolling_all_complete, }\DataTypeTok{by =} \KeywordTok{c}\NormalTok{(}\StringTok{'id'}\NormalTok{, }\StringTok{'annotation_num'}\NormalTok{)) }
+
 
 \CommentTok{# fit the spanish models}
 \CommentTok{# make the datasets}
@@ -2002,9 +2034,9 @@ Child ID & 80-clip & Cut-off & 80-clip & Cut-off\\
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{halfrow =} \KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{n}\NormalTok{()}\OperatorTok{/}\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# for a sanity check}
 \StringTok{  }\KeywordTok{filter}\NormalTok{(}\KeywordTok{row_number}\NormalTok{() }\OperatorTok{>=}\StringTok{ }\KeywordTok{n}\NormalTok{()}\OperatorTok{*}\NormalTok{.}\DecValTok{66}\NormalTok{)}
 
-\CommentTok{#span_model_data_full <- span_rolling_complete2 %>% # Bolivia & US; all the data from the 'all-day' annotation}
-\CommentTok{#  group_by(id) %>%}
-\CommentTok{#  arrange(annotation_num)}
+\NormalTok{span_model_data_complete <-}\StringTok{ }\NormalTok{span_rolling_all_complete2 }\OperatorTok{%>%}\StringTok{ }\CommentTok{# Bolivia & US; all the data from the 'all-day' annotation}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(id) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(annotation_num)}
 
 \CommentTok{# fit the models}
 \NormalTok{span_model_firstthird <-}\StringTok{ }\NormalTok{span_model_data_firstthird }\OperatorTok{%>%}
@@ -2020,6 +2052,12 @@ Child ID & 80-clip & Cut-off & 80-clip & Cut-off\\
 \StringTok{  }\KeywordTok{summary}\NormalTok{()}
 
 \NormalTok{span_model_thirdthird <-}\StringTok{ }\NormalTok{span_model_data_thirdthird }\OperatorTok{%>%}
+\StringTok{  }\CommentTok{#filter(roll_sd_span!='NA') %>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ci_range =}\NormalTok{ cis}\OperatorTok{$}\NormalTok{upper }\OperatorTok{-}\StringTok{ }\NormalTok{cis}\OperatorTok{$}\NormalTok{lower) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# get the variance}
+\StringTok{  }\KeywordTok{lmer}\NormalTok{(ci_range}\OperatorTok{~}\NormalTok{annotation_num }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{|}\NormalTok{id), }\DataTypeTok{data =}\NormalTok{ .) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summary}\NormalTok{()}
+
+\NormalTok{span_model_complete<-}\StringTok{ }\NormalTok{span_model_data_complete }\OperatorTok{%>%}
 \StringTok{  }\CommentTok{#filter(roll_sd_span!='NA') %>%}
 \StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{ci_range =}\NormalTok{ cis}\OperatorTok{$}\NormalTok{upper }\OperatorTok{-}\StringTok{ }\NormalTok{cis}\OperatorTok{$}\NormalTok{lower) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# get the variance}
 \StringTok{  }\KeywordTok{lmer}\NormalTok{(ci_range}\OperatorTok{~}\NormalTok{annotation_num }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{|}\NormalTok{id), }\DataTypeTok{data =}\NormalTok{ .) }\OperatorTok{%>%}
