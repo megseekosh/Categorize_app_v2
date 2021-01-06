@@ -131,9 +131,11 @@ This is an example of a workflow to get you from a full daylong recording to one
 	
 
 ## Research Output
-  `Cychosz_Villaneuva_Weisleder.pdf` - poster from recent Many Paths to Language Acquisition Conference demosntrating the validity of the random sampling approach
+  `Cychosz_Villanueva_Weisleder_paper.pdf' - manuscript 
   
-  `Villaneuva_Cychosz_Weisleder.pdf` - poster from recent Many Paths to Language Acquisition Conference documenting dual language input in the US and Bolivia
+  `Cychosz_Villanueva_Weisleder_poster.pdf` - poster from recent Many Paths to Language Acquisition Conference demosntrating the validity of the random sampling approach
+  
+  `Villanueva_Cychosz_Weisleder.pdf` - poster from recent Many Paths to Language Acquisition Conference documenting dual language input in the US and Bolivia
   
   `validation_results.Rmd` - R notebook to generate results and analyses for `MPAL_poster`
   
@@ -145,6 +147,6 @@ This is an example of a workflow to get you from a full daylong recording to one
 
 Villaneuva, A., Cychosz, M., & Weisleder, A. (2020). Dual language input from adults and older children in two communities. Poster to given at the Many Paths to Language Acquisition Workshop, Nijmegen, The Netherlands.
 
-Cychosz, M., Villanueva, A., & Weisleder, A. (2020). Efficient estimation of bilingual children’s language exposure from daylong audio recordings. Poster to given at the Many Paths to Language Acquisition Workshop, Nijmegen, The Netherlands.
+Cychosz, M., Villanueva, A., & Weisleder, A. (2020). Efficient estimation of children’s language exposure in two bilingual communities. https://psyarxiv.com/dy6v2/ 
 
 Usoltsev, A. (2015). Voice Activity Detector-Python. GitHub Repository. https://github.com/marsbroshok/VAD-python
