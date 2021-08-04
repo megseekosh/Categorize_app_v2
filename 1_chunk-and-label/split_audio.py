@@ -16,6 +16,7 @@ def split_file(source_file, output_directory="output"):
 
     # This is metadata about the file we will be splitting
     data = mediainfo(source_file)
+ 
 
     # This is a conversaion factor used to cut apart the audio into one minute
     #  chunks. Often sample_rate given can be slightly off, so I decided to use
@@ -24,7 +25,7 @@ def split_file(source_file, output_directory="output"):
     #samples_per_minute = int(60*len(sound)/float(data["duration"]))
 
     #### NOW USING 30 SECOND CHUNKS 
-    samples_per_minute = int(30*len(sound)/float(data["duration"]))
+    samples_per_minute = int(30*len(sound)/float(data['duration']))
 
     # Get log_base_10 of number of minutes in the file to figure out how long
     #  the filename ids must be. If it is between 10 and 99 then all outputs
@@ -32,7 +33,7 @@ def split_file(source_file, output_directory="output"):
     #name_size = ceil(log10(float(data["duration"])/60))
 
     #### NOW USING 30 SECOND CHUNKS 
-    name_size = ceil(log10(float(data["duration"])/30))
+    name_size = ceil(log10(float(data['duration'])/30))
 
 
     # Number of minutes in the file, rounded upwards

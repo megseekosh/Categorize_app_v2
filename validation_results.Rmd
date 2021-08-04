@@ -16,7 +16,7 @@ knitr::opts_chunk$set(message=FALSE,
                       cache=FALSE)
 ```
 
-```{r, load necessary packages, include = FALSE}
+```{r, load necessary packages, include = FALSE, cache=FALSE}
 library('dplyr')
 library('tidyverse')
 library('ggplot2')
@@ -27,6 +27,7 @@ library('lme4')
 library('lmerTest')
 library('binom')
 library('stringr')
+set.seed(1234)
 ```
 
 ```{r, load in data, include=FALSE}
@@ -347,11 +348,15 @@ lang_density <- actual_lang_estimate %>%
             color="gray36", linetype="dashed", size=1) +
   xlab("Estimates of minority language quantity") +
   ylab("Density") +
-  theme(axis.text=element_text(size=8),
-      axis.title=element_text(size=17,face="bold"))
+  guides(fill=guide_legend(title="Language")) + 
+  theme(axis.text=element_text(size=14),
+      axis.title=element_text(size=19,face="bold"),
+      legend.text = element_text(size=14),
+      legend.title = element_text(size=19,face="bold"),
+      strip.text = element_text(size=12))
 lang_density
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/min_lang_density_plot.jpeg", height = 400, width = 700)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/min_lang_density_plot.tiff", height = 650, width = 900)
 lang_density
 dev.off()
 ```
@@ -493,8 +498,8 @@ knitr::kable(lang_tbl, caption = 'Minority language estimates by child and annot
              booktabs=T, 
              row.names = FALSE, 
              col.names = c("Corpus (ID)", "Random", "All-day", "Absolute error", "n=100 simulations of random sampling Avg. (SD) Range", "Within-corpus correlation between random and all-day estimates")) %>% 
-  column_spec(1, width = "5.5cm") %>%
-    column_spec(4, width = "3cm") %>%
+  column_spec(1, width = "3cm") %>%
+    column_spec(2:4, width = "2cm") %>%
   column_spec(5:6, width = "4cm") %>%
   kable_styling() %>%
   add_header_above(c(" " = 1, "Annotation Method" = 2, " " = 3)) %>%
@@ -516,7 +521,7 @@ us_plot <- plot_data %>%
   distinct(id, .keep_all = T) %>%
 ggplot(., aes(random, complete)) +
   geom_smooth(method = "lm", color="black") +
-  geom_jitter(aes(size=num_clips,color=round(percen_ofallclips_drawn,2)),alpha=.9,position = position_jitter(width = 0.07, height = .01)) +
+  geom_jitter(aes(color=round(percen_ofallclips_drawn,2)),alpha=.9,size=9,position = position_jitter(width = 0.07, height = .01)) +
   scale_size_continuous(range = c(5, 9)) + 
   scale_colour_gradient(low='indianred1', high = 'indianred4') +
   ylab("Proportion computed over \n entire recording") + 
@@ -527,13 +532,14 @@ ggplot(., aes(random, complete)) +
   labs(col='% of clips drawn \n in random sampling') + 
        #title = 'Proportion of Spanish clips \n in U.S. corpus') +
  theme(title = element_text(size=18, face="bold"),
-   axis.text=element_text(size=14),
-      axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(size=15)) +
-      guides(size=guide_legend(title="Total # of clips in \n recording"))
+   axis.text=element_text(size=19),
+      axis.title=element_text(size=23,face="bold"),
+      legend.title = element_text(size=21),
+      legend.text = element_text(size=17)) #+
+      #guides(size=guide_legend(title="Total # of clips in \n recording"))
 us_plot
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/us_plot.jpeg", height = 500, width = 600)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/us_plot.tiff", height = 800, width = 800)
 us_plot
 dev.off()
 ```
@@ -559,18 +565,18 @@ ggplot(., aes(random, complete)) +
   labs(col='% of clips drawn \n in random sampling') + 
        #title = 'Proportion of Quechua clips \n in Bolivian corpus') +
  theme(title = element_text(size=18, face="bold"),
-   axis.text=element_text(size=14),
-      axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(size=15))+
+   axis.text=element_text(size=19),
+      axis.title=element_text(size=23,face="bold"),
+      legend.title = element_text(size=21),
+      legend.text = element_text(size=17)) +
        #legend.position = c(.8, .5)) +
       guides(size=guide_legend(title="Total # of clips in \n recording"))
 bo_plot
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/bolivia_plot.jpeg", height = 500, width = 600)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/bolivia_plot.tiff", height = 800, width = 800)
 bo_plot
 dev.off()
 ```
-
 
 ```{r}
 # finally, we want to actuallly plot the proportions of each language category by child and annotation method
@@ -579,27 +585,30 @@ lang_props <- plot_data %>%
   distinct_at(., vars(id, proportion, language), .keep_all = T) %>%
   mutate(method=plyr::mapvalues(method, "complete", "all-day"),
          id=plyr::mapvalues(id, c("198-9mo", "261-8mo", "267-12mo"), c("198", "261", "267")),
-         language=case_when(language=='percen_que' & location=='Bolivia' ~ " Quechua", 
-                         language=='percen_que' & location=='US' ~ ' English',
+         language=case_when(language=='percen_que' & location=='Bolivia' ~ 'Quechua', 
+                         language=='percen_que' & location=='US' ~ 'English',
                          TRUE ~ as.character(language)),
          language=plyr::mapvalues(language, c("percen_mxd", "percen_span"), c("Mixed", "Spanish"))) %>%
+  mutate(language=factor(language, levels = c("English", "Quechua", "Mixed", "Spanish"))) %>%
   ggplot(., aes(fill=language, y=proportion, x=method)) +
   geom_bar(position='stack', stat='identity') +
   facet_grid(~id) +
-  xlab('annotation method') +
+  ylab("Proportion") +
+  guides(fill=guide_legend(title="Language")) + 
+  xlab('Annotation Method') +
     labs(subtitle = "Quechua-Spanish corpus                       Spanish-English corpus") +
   #labs(title="Proportion of language categories, by child and annotation method",
    #    subtitle = "Quechua-Spanish corpus                                          Spanish-English corpus") +
   theme(axis.text.x = element_text(angle = 45, hjust = .9, vjust=.8, size=11),
         plot.title = element_text(face="bold"),
         plot.subtitle = element_text(color='gray50',hjust = .55, face='bold', size=14),
-        axis.title=element_text(size=17,face="bold"),
+        axis.title=element_text(size=19,face="bold"),
         legend.title = element_text(size=15,face = "bold"),
-        legend.text = element_text(size=13),
+        legend.text = element_text(size=12),
         strip.text.x = element_text(size=9, face="bold"))
 lang_props
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/stacked_lang_plot.jpeg", height = 500, width = 700)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/stacked_lang_plot.tiff", height = 500, width = 700)
 lang_props
 dev.off()
 ```
@@ -648,7 +657,6 @@ o3$total <- o3$percen_ods + o3$percen_ads + o3$percen_cds
 ```
 
 ```{r, CDS simulations}
-set.seed(1234)
 # now simulate 100 CDS estimates from each child
 # take however many clips were used to compute the randomly-sampled estimate
 # then compute the prop. of those that are CDS
@@ -725,10 +733,10 @@ cds_density <- o3 %>%
   xlab("Estimates of child-directed speech quantity") +
   ylab("Density") +
   theme(axis.text=element_text(size=8),
-      axis.title=element_text(size=17,face="bold"))
+      axis.title=element_text(size=19,face="bold"))
 cds_density
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/cds_density_plot.jpeg", height = 400, width = 700)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/cds_density_plot.tiff", height = 400, width = 700)
 cds_density
 dev.off()
 
@@ -763,12 +771,14 @@ reg_density <- o3 %>%
             #color="dodgerblue3", linetype="solid", size=.5) +
   xlab("Speech register estimates") +
   ylab("Density") +
-  theme(axis.text=element_text(size=10),
-      axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(face="bold", size=15))
+  theme(axis.text=element_text(size=14),
+      axis.title=element_text(size=19,face="bold"),
+      legend.title = element_text(face="bold", size=19),
+      legend.text = element_text(size=14),
+      strip.text = element_text(size=12))
 reg_density
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/reg_density_plot.jpeg", height = 400, width = 700)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/reg_density_plot.tiff", height = 650, width = 900)
 reg_density
 dev.off()
 ```
@@ -883,8 +893,8 @@ knitr::kable(final_reg_tbl2, caption = 'Target child-directed speech estimates b
              booktabs=T, 
              row.names = FALSE, 
              col.names = c("Corpus (ID)", "Random", "All-day", "Absolute error", "n=100 simulations of random sampling Avg. (SD) Range", "Within-corpus correlation between random and all-day estimates")) %>% # "
-  column_spec(1, width = "4cm") %>% # force column headers onto two rows
-  column_spec(4, width = "3cm") %>%
+  column_spec(1, width = "3cm") %>%
+    column_spec(2:4, width = "2cm") %>%
   column_spec(5:6, width = "4cm") %>%
   kable_styling() %>%
   add_header_above(c(" " = 1, "Annotation Method" = 2, " " = 3)) %>%
@@ -969,23 +979,24 @@ cds_plot <- ggplot(cds_plot_data, aes(random, complete)) +
   geom_jitter(aes(size=num_clips,color=round(percen_ofallclips_drawn,2)),alpha=.9,position = position_jitter(width = 0.07, height = .01)) +
   scale_size_continuous(range = c(5, 9)) + 
   scale_colour_gradient(low='indianred1', high = 'indianred4') +
-  ylab("Proportion computed over entire recording") + 
-  xlab("Proportion computed over randomly sampled clips") + 
+  ylab("Proportion computed over \n entire recording") + 
+  xlab("Proportion computed over \n randomly sampled clips") + 
   ylim(0,0.9) +
   xlim(0,0.9)+
   facet_wrap(~location, scales = "fixed") +
   labs(col='% of clips annotated \n in random sampling') + 
        #title = 'Proportion of child-directed speech clips \n in U.S. and Bolivian corpora') +
  theme(title = element_text(size=18, face="bold"),
-   axis.text=element_text(size=14),
-      axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(size=9),
+   axis.text=element_text(size=19),
+      axis.title=element_text(size=23,face="bold"),
+      legend.title = element_text(size=21),
       #legend.position = c(.85, .55),
-      strip.text.x = element_text(size=12, face="bold")) +
+      legend.text = element_text(size=17),
+      strip.text.x = element_text(size=21, face="bold")) +
       guides(size=guide_legend(title="Total # of clips in \n recording"))
 cds_plot
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/cds_plot.jpeg", height = 500, width = 500)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/cds_plot.tiff", height = 800, width = 825)
 cds_plot
 dev.off()
 ```
@@ -1001,20 +1012,22 @@ reg_props <- o3 %>%
   ggplot(., aes(fill=register, y=proportion, x=method)) +
   geom_bar(position='stack', stat='identity') +
   facet_grid(~id) +
-  xlab('annotation method') +
+  xlab('Annotation Method') +
+  ylab('Proportion') + 
+    guides(fill=guide_legend(title="Register")) + 
    labs(subtitle = "Quechua-Spanish corpus                   Spanish-English corpus") +
   #labs(title="Proportion of speech register categories, by child and annotation method",
        #subtitle = "Quechua-Spanish corpus                                       Spanish-English corpus") +
   theme(axis.text.x = element_text(angle = 45, hjust = .9, vjust=.8, size=11),
         plot.title = element_text(face="bold"),
         plot.subtitle = element_text(color='gray50',hjust = .55, face='bold', size=14),
-        axis.title=element_text(size=17,face="bold"),
+        axis.title=element_text(size=19,face="bold"),
         legend.title = element_text(size=15,face = "bold"),
-        legend.text = element_text(size=13),
+        legend.text = element_text(size=12),
         strip.text.x = element_text(size=9, face="bold"))
 reg_props
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/stacked_register_plot.jpeg", height = 500, width = 700)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/stacked_register_plot.tiff", height = 500, width = 700)
 reg_props
 dev.off()
 ```
@@ -1163,8 +1176,8 @@ ques_plot <- plot_data %>%
   merge(., per_ann, by='id') %>%
   distinct(id, .keep_all = T) %>%
 ggplot(., aes(as.numeric(random), as.numeric(ques_est))) +
-  geom_smooth(method = "lm", color="black", se=FALSE) +
-  geom_jitter(aes(size=num_clips,color=round(percen_ofallclips_drawn,2)),alpha=.9,position = position_jitter(width = 0.07, height = .01)) +
+  geom_smooth(method = "lm", color="black",se=FALSE) +
+  geom_jitter(aes(color=round(percen_ofallclips_drawn,2)),alpha=.9,size=9,position = position_jitter(width = 0.07, height = .01)) +
   scale_size_continuous(range = c(5, 9)) + 
   scale_colour_gradient(low='indianred1', high = 'indianred4') +
   ylab("Proportion computed from \n background questionnaire") + 
@@ -1174,13 +1187,14 @@ ggplot(., aes(as.numeric(random), as.numeric(ques_est))) +
   labs(col='% of clips drawn \n in random sampling') + 
        #title = 'Proportion of Spanish clips \n in U.S. corpus: random sampling and background questionnaire methods') +
  theme(title = element_text(size=18, face="bold"),
-   axis.text=element_text(size=14),
-      axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(size=15)) +
-      guides(size=guide_legend(title="Total # of clips in \n recording"))
+   axis.text=element_text(size=19),
+      axis.title=element_text(size=23,face="bold"),
+      legend.title = element_text(size=21),
+      legend.text = element_text(size=17)) #+
+      #guides(size=guide_legend(title="Total # of clips in \n recording"))
 ques_plot
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/ques_plot.jpeg", height = 500, width = 600)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/ques_plot.tiff", height = 800, width = 800)
 ques_plot
 dev.off()
 ```
@@ -1282,18 +1296,21 @@ ggplot(., aes(annotation_num, roll_prop_cds)) +
   #geom_line(aes(y=rollapply(roll_prop_cds, 10, FUN=sd, fill=NA))) +
   geom_ribbon(aes(ymax=upper_ci, ymin=lower_ci), fill='lightblue', color='deepskyblue4') +  
     geom_line(aes(y=mean_ci), color='gray40', size=.8) + 
-  xlab("# of speech register annotations") + 
-  ylab("CDS estimation and variance") + 
-  facet_wrap(~id, scales = "free") +
+  xlab("No. of Speech Register Annotations") + 
+  ylab("CDS Estimation and Variance") + 
+      scale_x_continuous(breaks = seq(0,150, by=25)) + 
+  facet_wrap(~id, scales = "free_x") +
   #title = 'Variance in child-directed estimation as a function of clips annotated') +
- theme(title = element_text(size=12),
-   axis.text=element_text(size=8),
-      axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(size=15)) +
-  labs(caption = "'# of speech register annotations' includes 'unsure' speech register annotations.")
+ theme(title = element_text(size=14),
+   axis.text=element_text(size=12),
+      axis.title=element_text(size=19,face="bold"),
+      legend.title = element_text(size=15),
+      strip.text.x = element_text(size=12),
+      legend.text = element_text(size=12)) +
+  labs(caption = "'No. of speech register annotations' includes 'unsure' speech register annotations.")
 cds_var_plot
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/cds_CI_var_plot.jpeg", height = 450, width = 700)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/cds_CI_var_plot.tiff", height = 600, width = 900)
 cds_var_plot
 dev.off()
 ```
@@ -1344,18 +1361,21 @@ span_var_plot <- span_rolling2 %>%
 ggplot(., aes(annotation_num, roll_prop_span)) +
   geom_ribbon(aes(ymax=upper_ci, ymin=lower_ci), fill='lightblue', color='deepskyblue4') +
   geom_line(aes(y=mean_ci), color='gray40', size=.8) + 
-  xlab("# of language annotations") + 
-  ylab("Spanish language estimation \n and variance") + 
-  facet_wrap(~id, scales = "free") +
+  xlab("No. of Language Annotations") + 
+  ylab("Spanish Language Estimation \n and Variance") + 
+    scale_x_continuous(breaks = seq(0,160, by=25)) + 
+  facet_wrap(~id, scales = "free_x") +
   #title = 'Variance in Spanish language estimation as a function of clips drawn: US corpus') +
- theme(title = element_text(size=12),
-   axis.text=element_text(size=8),
-      axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(size=15))  +
-  labs(caption = "'# of language annotations' includes 'unsure' language annotations.")
+ theme(title = element_text(size=14),
+   axis.text=element_text(size=12),
+      axis.title=element_text(size=19,face="bold"),
+      legend.title = element_text(size=15),
+      strip.text.x = element_text(size=12),
+      legend.text = element_text(size=12))  +
+  labs(caption = "'No. of language annotations' includes 'unsure' language annotations.")
 span_var_plot
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/span_CI_var_plot.jpeg", height = 450, width = 700)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/span_CI_var_plot.tiff", height = 600, width = 900)
 span_var_plot
 dev.off()
 ```
@@ -1392,18 +1412,21 @@ que_var_plot <- que_rolling2 %>%
 ggplot(., aes(annotation_num, roll_prop_que)) +
   geom_ribbon(aes(ymax=upper_ci, ymin=lower_ci), fill='lightblue', color='deepskyblue4') +
   geom_line(aes(y=mean_ci), color='gray40', size=.8) + 
-  xlab("# of language annotations") + 
-  ylab("Quechua language estimation \n and variance") + 
-  facet_wrap(~id, scales = "free") +
+  xlab("No. of Language Annotations") + 
+  ylab("Quechua Language Estimation \n and Variance") + 
+      scale_x_continuous(breaks = seq(0,160, by=25)) + 
+  facet_wrap(~id, scales = "free_x") +
   #title = 'Variance in Quechua language estimation as a function of clips drawn: Bolivia corpus') +
- theme(title = element_text(size=12),
-   axis.text=element_text(size=8),
-      axis.title=element_text(size=17,face="bold"),
-      legend.title = element_text(size=15)) +
-  labs(caption = "'# of language annotations' includes 'unsure' language annotations.")
+ theme(title = element_text(size=14),
+   axis.text=element_text(size=12),
+      axis.title=element_text(size=19,face="bold"),
+      legend.title = element_text(size=15),
+      strip.text.x = element_text(size=12),
+      legend.text = element_text(size=12)) +
+  labs(caption = "'No. of language annotations' includes 'unsure' language annotations.")
 que_var_plot
 
-jpeg("/Users/megcychosz/Google Drive/biling_CDS/results/figures/que_CI_var_plot.jpeg", height = 450, width = 700)
+tiff("/Users/megcychosz/Google Drive/biling_CDS/results/figures/que_CI_var_plot.tiff", height = 600, width = 900)
 que_var_plot
 dev.off()
 ```
