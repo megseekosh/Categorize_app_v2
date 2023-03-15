@@ -27,7 +27,7 @@ The following dependencies are required to run the applications and scripts in t
 
 ### To prepare daylong audio recordings for annotation and annotate them
 
-`1_chunk-and-label/split_app_basel.py`
+`1_split_app_basel.py`
 	- chops longform recordings into clips according to their LENA annotations
 	- Creates accompanying metadata file `config.csv` which contains % vocal acvitity, timestamp of clip in original file, speaker metadata, filename, etc.
 	  
@@ -47,7 +47,7 @@ This is an example of a workflow to get you from a full daylong recording to one
 
 2. Run `segments.pl`, e.g. by `perl segments.pl itsfile segments.csv`
 
-3. Run `split_app_basel.py`
+3. Run `1_split_app_basel.py`
 
 	Using the command line, move inside of `1_chunk-and-label/` and run the following where childID is the ID of the participant (any length or format), birthdate is YYMMDD, recordingdate is YYYYMMDD, and gender is any way that you would like to code participant gender (e.g. 'Female', 'Non-binary', etc.). 
 	
