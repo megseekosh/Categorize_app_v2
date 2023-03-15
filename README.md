@@ -1,11 +1,12 @@
 # Categorize_app 
 
-GUI to chop, categorize, and annotate audio clips from daylong recordings. This version annotates ambient language characteristics like language spoken (for bilingual environments), child-directed speech, and speaker category. However, the application is easily modifiable for any annotation categories. 
+GUI to chop, categorize, and annotate audio clips from daylong recordings.
 
 ## What's new in this fork
 
 * Includes segments.pl to make use of LENA .its files (source: [https://github.com/HomeBankCode/lena-its-tools/blob/master/segments.pl](https://github.com/HomeBankCode/lena-its-tools/blob/3ae8e06b1042956ac9e0cf273be926a6764594e1/segments.pl))
-* * Used LENA annotations rather than the original vocal activity detector. Now you can filter to only certain LENA annotations, or exclude certain ones.
+* Used LENA annotations rather than the original vocal activity detector. Now you can filter to only certain LENA annotations, or exclude certain ones.
+* Modified annotation script to use `playaudio` so that it can be used on Windows
 * Slightly simplified annotation workflow - no need to press "Play" for the first file you annotate
 * Annotation script keeps track of the total duration of annotated clips so far and stops you when you've annotated an hour of clips
 
