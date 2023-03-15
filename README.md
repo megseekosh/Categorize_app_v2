@@ -2,6 +2,13 @@
 
 GUI to chop, categorize, and annotate audio clips from daylong recordings. This version annotates ambient language characteristics like language spoken (for bilingual environments), child-directed speech, and speaker category. However, the application is easily modifiable for any annotation categories. 
 
+## What's new in this fork
+
+* Includes segments.pl to make use of LENA .its files (source: [https://github.com/HomeBankCode/lena-its-tools/blob/master/segments.pl](https://github.com/HomeBankCode/lena-its-tools/blob/3ae8e06b1042956ac9e0cf273be926a6764594e1/segments.pl))
+* * Used LENA annotations rather than the original vocal activity detector. Now you can filter to only certain LENA annotations, or exclude certain ones.
+* Slightly simplified annotation workflow - no need to press "Play" for the first file you annotate
+* Annotation script keeps track of the total duration of annotated clips so far and stops you when you've annotated an hour of clips
+
 ## What's what in this repo
 
 * [A description of the materials](#description-of-materials-in-the-repo)
@@ -9,7 +16,7 @@ GUI to chop, categorize, and annotate audio clips from daylong recordings. This 
 * [Research output](#research-output)
 
 ## Dependencies 
-The following dependencies are required to run the applications and scripts in this repo: `ffprobe`, `ffmpeg`, (both available [here](https://evermeet.cx/ffmpeg/)), `pydub`, `matplotlib`, `scipy`, and `pandas`. In addition, this repo is configured for Python 3.7.0 or older. That doesn't mean it's unworkable with newer versions, but you may have to create some work arounds. One solution is to configure a Python 3.7.0 environment within Anaconda:
+The following dependencies are required to run the applications and scripts in this repo: `ffprobe`, `ffmpeg`, (both available [here](https://evermeet.cx/ffmpeg/)), `playaudio`, `pydub`, `matplotlib`, `scipy`, and `pandas`. In addition, this repo is configured for Python 3.7.0 or older. That doesn't mean it's unworkable with newer versions, but you may have to create some work arounds. One solution is to configure a Python 3.7.0 environment within Anaconda:
 
 	conda create --name py37 python=3.7.0 pip
 
