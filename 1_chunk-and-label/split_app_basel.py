@@ -38,7 +38,7 @@ import os
 # These are used to split audio and tell its speech contents
 from pydub import AudioSegment
 from pydub.utils import mediainfo
-from find_speech import vad_trial
+#from find_speech import vad_trial
 # for merging segments
 from scipy.optimize import minimize_scalar
 import pandas as pd
@@ -346,8 +346,8 @@ def main(child_ID=sys.argv[1], birth_date=sys.argv[2], record_date=sys.argv[3], 
     rows_used = split_file(audio_file, output_dir, segments_df,
                            child_ID=child_ID, record_date=record_date)
 
-    # Run the Voice Activation Detector on each file
-    print("Running Vocal Activity Detector")
+    #print("Running Vocal Activity Detector")
+    # Prepare the metadata CSV we will write
     if globals:
         global clips_info
     clips_info = []     # this was originally called percents
