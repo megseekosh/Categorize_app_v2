@@ -38,7 +38,7 @@ import os
 # These are used to split audio and tell its speech contents
 from pydub import AudioSegment
 from pydub.utils import mediainfo
-#from find_speech import vad_trial
+from find_speech import vad_trial
 # for merging segments
 from scipy.optimize import minimize_scalar
 import pandas as pd
@@ -359,7 +359,7 @@ def main(child_ID=sys.argv[1], birth_date=sys.argv[2], record_date=sys.argv[3], 
         start_time = segments_df.at[row_index, 'startsec'] * 1000  # convert to ms
         end_time = segments_df.at[row_index, 'endsec'] * 1000
         duration = segments_df.at[row_index, 'duration']
-        vad_percents = None #vad_trial(filename)
+        vad_percents = vad_trial(filename)
         #to get multiple columns we add everything to what was just the "percents" list
         #in order of    file name,  		 id,        age,       date,    gender,  start time,   percents,    end time,   duration of clip
         clips_info.append([filename_for_csv, child_ID, birth_date, record_date, gender, start_time, vad_percents, end_time, duration])
