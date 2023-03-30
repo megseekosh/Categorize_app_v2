@@ -233,7 +233,7 @@ def main():
 	beginoptions_choices = {"No speech", "Unsure speaker and unsure language", "Categorize clip"}
 	lang_choices = {"English", "Non-English language(s)", "Both"}
 	speaker_choices = {"Main caregiver", "Not main caregiver(s)", "Both"}
-	register_choices = {"ADS", "IDS", "Both"}
+	register_choices = {"ADS", "IDS", "Unsure/Both/Neither"}
 
 	beginoptionscat.set("Categorize clip")
 	langcategory.set("Categorize language")
