@@ -290,6 +290,10 @@ def main(child_ID=sys.argv[1], birth_date=sys.argv[2], record_date=sys.argv[3], 
     print()
     print("I'll merge any sequential segments for you. How much of a gap should I allow?")
     tolerable_distance = input('Longest permissible gap (in seconds): ')
+    # since we're already prompting here, also check what percentage of voicing is OK
+    print("What's the minimum percentage of voicing you want? Clips with a lower percentage will be excluded.")
+    minimum_voicing_percent = input("Minimum voicing percentage (eg '0.1' for 10%): ")
+    minimum_voicing_percent = float(minimum_voicing_percent)
     # convert to number
     if '.' in tolerable_distance:
         tolerable_distance = float(tolerable_distance)
@@ -314,7 +318,7 @@ def main(child_ID=sys.argv[1], birth_date=sys.argv[2], record_date=sys.argv[3], 
     segments_df = pd.DataFrame(segments_data)
 
     # filter to interesting segments
-    print("Filtering segments...")
+    print("Filtering segments with Lena...")
     # loop over the segments csv and chop the audio file to match its segmentation
     # limiting to choices made by user
     # add a column to the dataframe for which segments are interesting
@@ -345,37 +349,44 @@ def main(child_ID=sys.argv[1], birth_date=sys.argv[2], record_date=sys.argv[3], 
         global rows_used
     rows_used = split_file(audio_file, output_dir, segments_df,
                            child_ID=child_ID, record_date=record_date)
-
-    #print("Running Vocal Activity Detector")
-    # Prepare the metadata CSV we will write
     if globals:
         global clips_info
     clips_info = []     # this was originally called percents
+    rejected_clips = []
     for i in range(len(rows_used)):
         # rows_used[i] is some info about a row. rows_used[i][0] is row info from segments.csv
         # rows_used[i][1] is the filename of the audio that was split out for that segment
         filename_for_csv = rows_used[i][1]
         row_index = rows_used[i][0]
+        vad_percents = vad_trial(filename_for_csv)
         start_time = segments_df.at[row_index, 'startsec'] * 1000  # convert to ms
         end_time = segments_df.at[row_index, 'endsec'] * 1000
         duration = segments_df.at[row_index, 'duration']
-        vad_percents = vad_trial(filename)
-        #to get multiple columns we add everything to what was just the "percents" list
-        #in order of    file name,  		 id,        age,       date,    gender,  start time,   percents,    end time,   duration of clip
-        clips_info.append([filename_for_csv, child_ID, birth_date, record_date, gender, start_time, vad_percents, end_time, duration])
+        # clips_info will become a CSV with these columns:
+        #      file name,  		 id,        age,       date,    gender,  start time,   percents,    end time,   duration of clip
+        row = [filename_for_csv, child_ID, birth_date, record_date, gender, start_time, vad_percents, end_time, duration]
+        # continue if this meets the voicing requirement, otherwise put it in the reject pile
+        if vad_percents > minimum_voicing_percent:
+            clips_info.append(row)
+        else:
+            rejected_clips.append(row)
 
-    # Write the csv data log file
+    # Write the config.csv data log file
     print("Writing the csv")
-    with open(output_dir+"/config.csv", 'w') as output:
-        #writer = csv.writer(output)
-        #writer.writerows(percents)
-        #changed to add details to config
+    with open(os.path.join(output_dir, "config.csv"), 'w') as output:
         writer = csv.writer(output, delimiter=',')
-        #this makes the header for the rows 
+        #this makes the header for the rows
         writer.writerow(['file_name', 'id', 'age_YYMMDD', 'date_YYYYMMDD', 'gender', 'start_time', 'percents_voc', 'end_time', 'duration', 'researcher_present', 'sleeping'])
-        #information for the rows 
+        #information for the rows
         #percents actually contains everything for all information
         writer.writerows(clips_info)
+    # And the rejects.csv file
+    with open(os.path.join(output_dir, "rejects.csv"), 'w') as output:
+        writer = csv.writer(output, delimiter=',')
+        #this makes the header for the rows
+        writer.writerow(['file_name', 'id', 'age_YYMMDD', 'date_YYYYMMDD', 'gender', 'start_time', 'percents_voc', 'end_time', 'duration', 'researcher_present', 'sleeping'])
+        #information for the rows
+        writer.writerows(rejected_clips)
     return output_dir
 
 
