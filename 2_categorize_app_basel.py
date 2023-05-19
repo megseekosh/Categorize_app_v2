@@ -16,7 +16,9 @@ from tkinter.messagebox import showinfo
 from functools import partial
 import os
 import datetime
-from playsound import playsound
+from pydub import AudioSegment
+from pydub.playback import play
+#from playsound import playsound   #doesn't seem to work well
 
 
 # set how many ms of audio you want to annotate
@@ -33,6 +35,10 @@ job_done = False		# will be true when we're done annotating
 # if you want to change how many decimals the "annotation complete" window shows:
 minute_decimals = 2
 
+
+def playsound(filepath):
+    sound = AudioSegment.from_wav(filepath)
+    play(sound)
 
 # clear category selection   
 def clear():
@@ -91,6 +97,7 @@ def annotatorinfo():
 	showinfo('Window', "Select a metadata file")
 	fname = askopenfilename(filetypes =(("CSV File", "*.csv"),("all files","*.*")),
 			 title = "Please choose a config.csv file")
+	fname = os.path.normpath(fname)
 	outdir = os.path.split(fname)[0]
 	config_df = pd.read_csv(fname).assign(outdir=outdir) # the master config file
 
