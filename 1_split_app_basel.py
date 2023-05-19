@@ -188,11 +188,10 @@ def split_file(source_file, output_directory, segments_dataframe,
         # generate file name
         this_filepath = output_format % (output_directory, row.Index)
         this_filepath = this_filepath + ".wav"
-        this_filename = os.path.basename(this_filepath)
         if verbose:
             print(this_filepath)
         # remember that we are using this row (ie it's not filtered out)
-        rows_used.append([row.Index, this_filename])
+        rows_used.append([row.Index, this_filepath])
         # split out the audio file
         split_sound = sound[start_ms:end_ms]
         split_sound.export(this_filepath,
@@ -356,10 +355,12 @@ def main(child_ID=sys.argv[1], birth_date=sys.argv[2], record_date=sys.argv[3], 
     rejected_clips = []
     for i in range(len(rows_used)):
         # rows_used[i] is some info about a row. rows_used[i][0] is row info from segments.csv
-        # rows_used[i][1] is the filename of the audio that was split out for that segment
-        filename_for_csv = rows_used[i][1]
+        # rows_used[i][1] is the filepath of the audio that was split out for that segment
+        filepath = rows_used[i][1]
+        # categorize_app expects only the file name, not full path
+        filename_for_csv = os.path.basename(filepath)
         row_index = rows_used[i][0]
-        vad_percents = vad_trial(filename_for_csv)
+        vad_percents = vad_trial(filepath)
         start_time = segments_df.at[row_index, 'startsec'] * 1000  # convert to ms
         end_time = segments_df.at[row_index, 'endsec'] * 1000
         duration = segments_df.at[row_index, 'duration']
