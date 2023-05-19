@@ -186,15 +186,16 @@ def split_file(source_file, output_directory, segments_dataframe,
         start_ms = float(row.startsec) * 1000 # convert to ms
         end_ms = float(row.endsec) * 1000
         # generate file name
-        name_of_file = output_format % (output_directory, row.Index)
-        name_of_file = name_of_file + ".wav"
+        this_filepath = output_format % (output_directory, row.Index)
+        this_filepath = this_filepath + ".wav"
+        this_filename = os.path.basename(this_filepath)
         if verbose:
-            print(name_of_file)
+            print(this_filepath)
         # remember that we are using this row (ie it's not filtered out)
-        rows_used.append([row.Index, name_of_file])
+        rows_used.append([row.Index, this_filename])
         # split out the audio file
         split_sound = sound[start_ms:end_ms]
-        split_sound.export(name_of_file,
+        split_sound.export(this_filepath,
                             format="wav",
                             bitrate=data["bit_rate"])
     print("Split into " + str(len(rows_used)) + " clips")
