@@ -4,7 +4,7 @@
 app to read in and classify chunks of audio
 Meg Cychosz & Ronald Sprouse
 UC Berkeley
-
+Adapted by Luca Cavasso (Simon Fraser U) for BaSeL
 '''
 
 import tkinter as tk
@@ -18,7 +18,6 @@ import os
 import datetime
 from pydub import AudioSegment
 from pydub.playback import play
-#from playsound import playsound   #doesn't seem to work well
 
 
 # set how many ms of audio you want to annotate
@@ -40,7 +39,7 @@ def playsound(filepath):
     sound = AudioSegment.from_wav(filepath)
     play(sound)
 
-# clear category selection   
+# clear category selection
 def clear():
 	beginoptionscat.set("Categorize clip")
 	langcategory.set("Categorize language")
@@ -177,7 +176,7 @@ def next_audio():
 	if check_done(config_df, duration_so_far):
 		notify_finished()
 	else:
-		# ensure we don't randomly select this row in the future
+		# ensure we don't select this row in the future
 		config_df = config_df.drop(row.name)  # .name is where the original index is stored
 		global idx 
 		idx += 1 # update the global idx
@@ -195,12 +194,12 @@ def play_new_clip():
 		print("No more files to annotate")
 		notify_finished()
 	else:
-		row = config_df.sample(n=1).iloc[0] # randomly sample from df
+		row = config_df.iloc[0]			# select next row
 		if row['researcher_present']==1:
 			print('Researcher present in recording.')
-		elif row['percents_voc']==0: # if no vocal activity detected
+		elif row['percents_voc']==0:	# if no vocal activity detected
 			print('No vocal activity in clip.')
-		elif row['sleeping']==1: # if child is sleeping
+		elif row['sleeping']==1:		# if child is sleeping
 			print('Child is sleeping.')
 		audiofile = os.path.join(row.outdir, row.file_name)
 		print(idx, row.file_name) # keep us updated
