@@ -22,11 +22,6 @@ else:
     birth_date = None
     record_date = None
     gender = None
-# set the default value for 'globals' in main()
-if "globals" in sys.argv:
-    globalVars = True
-else:
-    globalVars = False
 
 # For the file dialog
 import tkinter as tk
