@@ -85,6 +85,8 @@ This is an example of a workflow to get you from a full daylong recording to one
 	When you have completed that annotation session, you can close the application and restart at any time. There is nothing else that you have to do. Your responses will always be recorded in `responses.csv` - they are saved when you press "Next."
 	
 	When you have annotated 60 minutes of audio, you will be prompted with a message indicating that you have finished annotation. You can change this duration by changing the variable `desired_duration` in `2_categorize_app_basel.py`.
+	
+	If you had multiple annotators, you should merge their response files. These are named 'responses\_[name]\_.csv' (insert the annotator's name for [name]).
 
 ## Citations
 
