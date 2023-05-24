@@ -23,6 +23,12 @@ else:
     record_date = None
     gender = None
 
+# set the default value for 'globals' in main()
+if "globals" in sys.argv:
+    globalVars = True
+else:
+    globalVars = False
+
 # For the file dialog
 import tkinter as tk
 from tkinter.filedialog import askopenfilename, askdirectory
@@ -37,6 +43,7 @@ from find_speech import vad_trial
 # for merging segments
 from scipy.optimize import minimize_scalar
 import pandas as pd
+from random import shuffle
 
 # function to comb through a df and merge segments with the same label that are close in time
 def merge_segments(df, max_distance, verbose=False, timed=False):
@@ -367,6 +374,9 @@ def main(child_ID=sys.argv[1], birth_date=sys.argv[2], record_date=sys.argv[3], 
             clips_info.append(row)
         else:
             rejected_clips.append(row)
+    # randomize the order of rows
+    shuffle(clips_info)
+
 
     # Write the config.csv data log file
     print("Writing the csv")
