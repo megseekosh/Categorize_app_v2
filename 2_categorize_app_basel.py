@@ -12,7 +12,7 @@ import tkinter.font as tkFont
 import pandas as pd
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
-from tkinter.messagebox import showinfo
+from tkinter.messagebox import showinfo, askyesno
 from functools import partial
 import os
 import datetime
@@ -88,10 +88,7 @@ def notify_finished():
 def annotatorinfo():
 	global config_df
 	global outdir
-	global content
-	global resp_df
-	global desired_duration
-	global duration_so_far
+	global annotator_name
 
 	showinfo('Window', "Select a metadata file")
 	fname = askopenfilename(filetypes =(("CSV File", "*.csv"),("all files","*.*")),
@@ -100,12 +97,46 @@ def annotatorinfo():
 	outdir = os.path.split(fname)[0]
 	config_df = pd.read_csv(fname).assign(outdir=outdir) # the master config file
 
-	try:
-		resp_df = pd.read_csv(os.path.join(outdir, "responses.csv")) # if available, open the response df in read mode 
-	except: # if not, create one
-		empty = pd.DataFrame().assign(id=None, age_YYMMDD=None, date_YYYYMMDD=None, gender=None, file_name=None, percents_voc=None, outdir=None, researcher_present=None) # add addtl columns, file_name=None, 
-		empty.to_csv(os.path.join(outdir, "responses.csv"), index=False) 
-		resp_df = pd.read_csv(os.path.join(outdir, "responses.csv"))
+	# Get annotator's name
+	annotate = tk.Toplevel()
+	annotate.title("Annotator information")
+	
+	def close_window(annotate):
+		annotate.destroy()
+
+	tk.Label(annotate, text="What is your name?").grid(row=0)
+	name = tk.Entry(annotate)
+	def get_name():
+		global annotator_name
+		annotator_name = name.get()
+	name.grid(row=0, column=1)
+
+	tk.Button(annotate, text="Enter", command=combine_funcs(get_name, partial(close_window, annotate), get_resp_df)).grid(row=7,column=1,columnspan=2)
+
+
+def get_resp_df():
+	global config_df
+	global outdir
+	global annotator_name
+	global resp_df
+	global desired_duration
+	global duration_so_far
+	global resp_df_filepath
+	resp_df_filename = 'responses_' + annotator_name.lower() + '.csv'
+	resp_df_filepath = os.path.join(outdir, resp_df_filename)
+	resp_df_exists = os.path.isfile(resp_df_filepath)
+	if resp_df_exists:
+		print('Writing responses to ' + resp_df_filepath)
+		resp_df = pd.read_csv(resp_df_filepath) # if available, open the response df in read mode 
+	else: # if not, confirm with user before creating
+		confirm_create = askyesno(title='Response CSV not found', message='Could not find ' + resp_df_filename +'.\nCreate new file ' + resp_df_filename + '?')
+		if confirm_create:
+			empty = pd.DataFrame().assign(id=None, age_YYMMDD=None, date_YYYYMMDD=None, gender=None, file_name=None, percents_voc=None, outdir=None, researcher_present=None) # add addtl columns, file_name=None, 
+			empty.to_csv(resp_df_filepath, index=False) 
+			resp_df = pd.read_csv(resp_df_filepath)
+		else:
+			# try getting their name again
+			return annotatorinfo()
 
 	# we need to know the duration of clips that have been annotated so far
 	if len(resp_df) > 0:
@@ -130,22 +161,9 @@ def annotatorinfo():
 	# if config_df is empty, it means we don't have anything else to annotate
 	if check_done(config_df, duration_so_far):
 		notify_finished()
-	else:
-		annotate = tk.Toplevel()
-		annotate.title("Annotator information")
-		
-		def close_window(annotate):
-			annotate.destroy()
+	# play first audio clip
+	play_new_clip()
 
-		tk.Label(annotate, text="What is your name?").grid(row=0)
-		name = tk.Entry(annotate)
-		def return_name():
-			global content
-			content = name.get()
-		name.grid(row=0, column=1)
-
-		# clicking "enter" also plays the first clip
-		tk.Button(annotate, text="Enter", command=combine_funcs(return_name, partial(close_window, annotate), play_new_clip)).grid(row=7,column=1,columnspan=2)
 
 # go to the next audio file
 def next_audio():
@@ -161,11 +179,11 @@ def next_audio():
 	register = registercategory.get() 
 	clip_comments = comments.get()
 	annotate_date_YYYYMMDD = datetime.datetime.now() # get current annotation time
-	print(beginoptions, language, speaker, register, annotate_date_YYYYMMDD, content, clip_comments) 
+	print(beginoptions, language, speaker, register, annotate_date_YYYYMMDD, annotator_name, clip_comments) 
 
-	allcols = pd.DataFrame([row]).assign(beginoptions=beginoptions, Language=language, Speaker=speaker,  Register=register, comments=clip_comments, annotate_date_YYYYMMDD=annotate_date_YYYYMMDD, annotator=content, repeats=repeat_ct) 
+	allcols = pd.DataFrame([row]).assign(beginoptions=beginoptions, Language=language, Speaker=speaker,  Register=register, comments=clip_comments, annotate_date_YYYYMMDD=annotate_date_YYYYMMDD, annotator=annotator_name, repeats=repeat_ct) 
 	resp_df = pd.concat([resp_df, allcols], sort=True)
-	resp_df.to_csv(os.path.join(outdir, "responses.csv"), index=False)  # yes, this overwrites responses.csv each time
+	resp_df.to_csv(resp_df_filepath, index=False)  # this overwrites the file each time
 
 	# update our duration counter
 	duration_so_far += row['duration']
