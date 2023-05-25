@@ -142,7 +142,7 @@ def get_resp_df():
 	if len(resp_df) > 0:
 		# filter out anything annotated as non-speech
 		filterdf = resp_df[resp_df['beginoptions'] != 'No speech']
-		duration_so_far = sum(filterdf.tolist())
+		duration_so_far = sum(filterdf['duration'].tolist())
 		# no change made to resp_df so that those annotations are preserved
 	# it was already set to 0 at start of script, so no need for an else
 
