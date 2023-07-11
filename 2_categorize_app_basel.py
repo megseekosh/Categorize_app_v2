@@ -34,10 +34,36 @@ job_done = False		# will be true when we're done annotating
 # if you want to change how many decimals the "annotation complete" window shows:
 minute_decimals = 2
 
+# play_sound() will try pydub and use playsound as backup, then remember which one worked
+# to make this happen, need to start with default audioplayer variable
+audioplayer = False
 
-def playsound(filepath):
-    sound = AudioSegment.from_wav(filepath)
-    play(sound)
+
+def play_sound(filepath):
+	global audioplayer
+	if audioplayer == 'pydub':
+		sound = AudioSegment.from_wav(filepath)
+		play(sound)
+	elif audioplayer == 'playsound':
+		playsound(filepath)
+	elif not audioplayer:
+		try:
+			# first try pydub
+			print("trying pydub")
+			sound = AudioSegment.from_wav(filepath)
+			play(sound)
+			# if it worked, keep using this pydub
+			audioplayer = 'pydub'
+		except Exception as e:
+			# print any error message for reference
+			print(e)
+			print()
+			# then try playsound package
+			print("trying playsound")
+			from playsound import playsound
+			playsound(filepath)
+			# if it worked, keep using playsound
+			audioplayer = 'playsound'
 
 # clear category selection
 def clear():
@@ -221,7 +247,7 @@ def play_new_clip():
 			print('Child is sleeping.')
 		audiofile = os.path.join(row.outdir, row.file_name)
 		print(idx, row.file_name) # keep us updated
-		playsound(audiofile)
+		play_sound(audiofile)
 
 
 
@@ -234,7 +260,7 @@ def next_and_play_audio():
 
 	
 def repeat():
-	playsound(audiofile)
+	play_sound(audiofile)
 	global repeat_ct
 	repeat_ct = repeat_ct + 1
 
@@ -257,10 +283,29 @@ def main():
 	speakercategory = tk.StringVar() 
 	registercategory = tk.StringVar()
 
-	beginoptions_choices = {"No speech", "Unsure speaker and unsure language", "Categorize clip"}
-	lang_choices = {"English", "Non-English language(s)", "Both"}
-	speaker_choices = {"Main caregiver", "Not main caregiver(s)", "Both"}
-	register_choices = {"ADS", "IDS", "Unsure/Both/Neither"}
+	# import dropdown menu choices. These should be specified in .txt files
+	# that are in the same directory as this script.
+	# find this script's filepath
+	thisfilepath = os.path.dirname(os.path.realpath(__file__))
+	# extrapolate txt files' paths
+	beginoptions_path = os.path.join(thisfilepath, '2a_categorize_beginoptions.txt')
+	lang_path = os.path.join(thisfilepath, '2b_categorize_language.txt')
+	speaker_path = os.path.join(thisfilepath, '2c_categorize_speaker.txt')
+	register_path = os.path.join(thisfilepath, '2d_categorize_register.txt')
+	# read and process the txt files
+	def read_options(filepath):
+		with open(filepath) as file:
+			options = file.readlines()
+		# remove any newline characters from the end of lines
+		for i in range(len(options)):
+			while options[i][-1:] == '\r' or options[i][-1:] == '\n':
+				options[i] = options[i][:-1]
+		return options
+
+	beginoptions_choices = read_options(beginoptions_path)
+	lang_choices = read_options(lang_path)
+	speaker_choices = read_options(speaker_path)
+	register_choices = read_options(register_path)
 
 	beginoptionscat.set("Categorize clip")
 	langcategory.set("Categorize language")
