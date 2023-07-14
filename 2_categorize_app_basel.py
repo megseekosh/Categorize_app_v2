@@ -21,7 +21,7 @@ from pydub.playback import play
 
 
 # set how many ms of audio you want to annotate
-desired_duration = 60 * 60 * 1000	 # in ms
+desired_duration = 60 * 60	 # in seconds
 
 #number of minute-audio-clips in folder; index of row in df
 idx = 0
@@ -87,9 +87,11 @@ def check_done(source_df, annotated_dur, desired_dur=desired_duration):
 	# return True if done, False if not
 	# check if we've annotated enough
 	if annotated_dur > desired_dur:
+		print('You have annotated more than the minimum desired duration')
 		return True
 	# check if there are more rows
 	elif len(source_df) == 0:
+		print('There is no more audio for you to annotate')
 		return True
 	else:
 		return False
@@ -100,8 +102,8 @@ def notify_finished():
 	global job_done
 	job_done = True
 	# report duration annotated in minutes to 2 decimal places
-	if duration_so_far > (60 * 1000):	# if duration > 1 min, print in min
-		printed_duration = round(duration_so_far/1000/60, minute_decimals)
+	if duration_so_far > 60:	# if duration > 1 min, print in min
+		printed_duration = round(duration_so_far/60, minute_decimals)
 		unit = 'minutes'
 	else:
 		printed_duration = int(duration_so_far)
