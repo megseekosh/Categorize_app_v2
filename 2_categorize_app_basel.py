@@ -118,13 +118,6 @@ def annotatorinfo():
 	global outdir
 	global annotator_name
 
-	showinfo('Window', "Select a metadata file")
-	fname = askopenfilename(filetypes =(("CSV File", "*.csv"),("all files","*.*")),
-			 title = "Please choose a config.csv file")
-	fname = os.path.normpath(fname)
-	outdir = os.path.split(fname)[0]
-	config_df = pd.read_csv(fname).assign(outdir=outdir) # the master config file
-
 	# Get annotator's name
 	annotate = tk.Toplevel()
 	annotate.title("Annotator information")
@@ -273,6 +266,8 @@ def main():
 	global speakercategory
 	global registercategory
 	global comments
+	global outdir
+	global config_df
 
 	root = tk.Tk() # refers to annotation window 
 	root.update()
@@ -338,7 +333,13 @@ def main():
 	tk.Button(frame, background="gray", text="   Play   ", command=repeat).grid(row=1, column=0)
 	tk.Button(frame, text="		Next	   ", command=combine_funcs(next_and_play_audio, clear), bg="gray").grid(row=1, column=2) 
 
-	app = annotatorinfo()
+	showinfo('Window', "Select a metadata file")
+	fname = askopenfilename(filetypes =(("CSV File", "*.csv"),("all files","*.*")),
+			 title = "Please choose a config.csv file")
+	fname = os.path.normpath(fname)
+	outdir = os.path.split(fname)[0]
+	config_df = pd.read_csv(fname).assign(outdir=outdir) # the master config file
+	annotatorinfo()
 	root.mainloop()
 
 if __name__ == "__main__":
