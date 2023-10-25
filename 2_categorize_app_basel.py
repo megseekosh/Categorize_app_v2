@@ -18,6 +18,7 @@ import os
 import datetime
 from pydub import AudioSegment
 from pydub.playback import play
+from playsound import playsound
 
 
 # set how many ms of audio you want to annotate
@@ -60,8 +61,6 @@ def play_sound(filepath):
 			print()
 			# then try playsound package
 			print("trying playsound")
-			from playsound import playsound
-			global playsound
 			playsound(filepath)
 			# if it worked, keep using playsound
 			audioplayer = 'playsound'
