@@ -7,8 +7,6 @@ import sys
 
 # set global variables. otherwise functions that use sys.argv elements
 # as default variables will throw errors.
-# TODO: correct
-sys.argv = ['filename', 'id','date','date2','gend']
 if __name__ == "__main__":
     if len(sys.argv) < 5:
         raise SyntaxError("""Not enough arguments supplied. Please re-run.
