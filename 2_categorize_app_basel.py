@@ -61,6 +61,7 @@ def play_sound(filepath):
 			# then try playsound package
 			print("trying playsound")
 			from playsound import playsound
+			global playsound
 			playsound(filepath)
 			# if it worked, keep using playsound
 			audioplayer = 'playsound'
